@@ -53,11 +53,12 @@ rezultat = re.search(r'\d+', text) #primul numar gasit 23
 text = "abbacdaaaxyzb123"
 rezultate = re.findall(r'[ab]+', text) #toate sirurile care contin doar a si b
 
-re_path(r'^pagina/a{2,4}\d+/$', views.afisare_pag) #/pagina/aaa19 def(request,cuvant):
+re_path(r'^pagina/a{2,4}\d+/$', views.afisare_pag) #/pagina/aaa19
 re_path(r'^pagina/[xyz]+/$', views.afisare_pag2) #/pagina/xyxyzzz
+
 re_path(r'^pag_cod/(?P<id>\d{3})/$', views.afis_cod) #pag_cod urmat de un id care are exact 3 cifre pag_cod/123
-
-
+Un parametru (cu nume) în cadrul căii definite ca expresie regulată are sintaxa: (?P<nume>expresie_regulata).
+def ceva(request,id):
 
 Templates
 def afis_template(request):
