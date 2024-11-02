@@ -14,7 +14,7 @@ DATABASES = {
     }
 }
 Adaugam aplicatie in INSATLLED APPS
-'aplicatie'
+'AplicatieDjangoConfig'
 
 pip install psycopg2
 
