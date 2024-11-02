@@ -1,3 +1,21 @@
+1) Creati o functie în views.py numita aduna_numere. Aceasta va trebui asociată unor cereri care incep cu /pag și se termină cu cifre (de exemplu: /pag/123, /pag/abc1234). 
+Vom considera cererile drept continand doar litere si cifre. Raspunsul va fi un text de forma: "numar cereri: [nr] suma numere: [suma]" unde se înlocuiesc zonele de text scrise cu paranteze drepte. 
+Numarul de cereri se referă practic la cate cereri s-au potrivit cu formatul. "Suma numere" va contine suma intregilor maximali de la finalul cererilor. 
+De exemplu, pentru cererile consecutive de mai jos, aratam ce se afiseaza, (sau nu scriem nimic daca cererea nu se potriveste si nu afiseaza).
+/pag/123
+numar cereri:1 suma numere: 123
+/pag/abcd
+-eroare
+/pag/12abcd
+-eroare
+/pag/abc1234
+numar cereri:2  suma numere: 1357
+/pag/12ab23
+numar cereri:3  suma numere: 1380
+/pag/0
+numar cereri:4  suma numere: 1380
+
+
 ct1=0    
 s1=0
 import re
@@ -13,7 +31,22 @@ def aduna_numere(request,numar):
         t=lista[-1]
         s1=s1+int(t)
         return HttpResponse(f"numar cereri: {ct1} suma numere: {s1}")
-    
+
+
+2) Creati o functie în views.py numita afiseaza_liste. Aceasta va trebui asociată unor cereri care incep cu /liste si sunt urmate de un querystring cu parametri. 
+Pentru fiecare parametru diferit se va genera o alta lista neordonata prin tagul <ul> (in raspunsul HTML) cu valorile asociate. 
+De exemplu /liste?a=10&b=20&a=15&b=11&a=8&b=123 va genera doua liste (una pentru parametrul a si alta pentru parametrul b) fiecare avand ca itemuri in lista valorile parametrilor ca mai jos:
+
+a :
+    10
+    15
+    8
+b:
+    20
+    11
+    123
+
+
 def afiseaza_liste(request):
     params=request.GET
     ul="<ul>"
