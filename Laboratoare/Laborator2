@@ -34,7 +34,8 @@ Expresii regulate in Python:
 ^ Începutul șirului
 $ Sfârșitul șirului
 |  (simbolul "pipe") - "sau" logic între expresii
-{ } Specifică numărul de apariții pentru caracterul sau grupul precedent. Se poate specifica un număr fix, de exemplu: a{3} înseamnă a repetat de exact 3 ori. Se poate specifica un număr minim de apariții: a{2,} cel puțin două repetări. Se pot specifica limita minimă și maximă: a{3,5} între 3 și 5 apariții.
+{ } Specifică numărul de apariții pentru caracterul sau grupul precedent. Se poate specifica un număr fix, de exemplu: a{3} înseamnă a repetat de exact 3 ori. 
+Se poate specifica un număr minim de apariții: a{2,} cel puțin două repetări. Se pot specifica limita minimă și maximă: a{3,5} între 3 și 5 apariții.
 [abc], [a-z] Mulțimi de caractere. Oricare dintre caracterele "a", "b", "c", respectiv orice literă mică
 [^abc] Orice caracter care nu este în mulțime
 (abc) Parantezele grupează
