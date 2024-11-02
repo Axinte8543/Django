@@ -91,7 +91,7 @@ def afis_template(request):
         }
     )
 
-{% if access_records %} #verifica daca contine date
+{% if access_records %} #verifica daca contine , access_records ar trebui sa fie un dictionar pentru for
     <table>
         <thead>
             <th>Site Name</th>
