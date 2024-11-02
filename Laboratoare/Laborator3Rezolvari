@@ -1,0 +1,81 @@
+1.
+Adaugam in models.py:
+class Prajitura(models.Model):
+    id=models.IntegerField(primary_key=True)
+    nume=models.CharField(max_length=50)
+    descriere=models.TextField()
+    pret=models.DecimalField(max_digits=8, decimal_places=2)
+    gramaj=models.IntegerField()
+    calorii=models.IntegerField()
+    pt_diabetici=models.BooleanField(default=False)
+    imagine=models.CharField(max_length=100)
+    data_adaugare=models.DateTimeField(auto_now_add=True)
+    categ_prajitura=[('Comanda Speciala','Comanda Speciala'),
+                    ('anivesara','Aniversara'),
+                    ('editie limitata','Edititie Limitata'),
+                    ('pentru copii','Pentru Copii'),
+                    ('dietetica','Dietetica'),
+                    ('comuna','Comuna')]
+    categorie=models.CharField(default='cofetarie',choices=categ_prajitura)
+    tipuri_produse=[('cofetarie','Cofetarie'),('patiserie','Patiserie'),('gelaterie','Gelaterie')] 
+    ambalaj=models.ForeignKey('Ambalaj',on_delete=models.CASCADE)
+    
+
+class Ingredient(models.Model):
+    nume=models.CharField(max_length=30,unique=True)
+    calorii=models.PositiveIntegerField()
+    unitate=models.CharField(max_length=10)
+    conexiune=models.ManyToManyField(Prajitura)
+    
+class Ambalaj(models.Model):
+    nume=models.CharField(max_length=20,unique=True)
+    optiuni=[('plastic','Plastic'),('hartie','Hartie'),('cutie','Cutie')]
+    material=models.CharField(choices=optiuni)
+    pret=models.DecimalField(max_digits=5, decimal_places=2)
+    
+
+In Postgresql o sa adaugam:
+select * from django.aplicatie_prajitura
+order by id ASC;
+
+select * from django.aplicatie_ambalaj;
+
+INSERT INTO django.aplicatie_ambalaj (nume, material, pret)
+VALUES ('Ambalaj Premium', 'plastic', 2.50);
+Insert into django.aplicatie_prajitura (id, nume, descriere, pret, gramaj, calorii, pt_diabetici, imagine, data_adaugare, categorie, ambalaj_id)
+VALUES
+    (1, 'Tort Ciocolata', 'Tort cu ciocolată neagră și cremă fină', 150.00, 1200, 4000, false, 'tort_ciocolata.jpg', NOW(), 'Comanda Speciala', 1),
+    (2, 'Ecler Vanilie', 'Ecler cu cremă de vanilie și glazură de ciocolată', 15.00, 150, 300, true, 'ecler_vanilie.jpg', NOW(), 'pentru copii', 1),
+    (3, 'Cheesecake', 'Cheesecake clasic cu topping de fructe de pădure', 75.00, 500, 1200, false, 'cheesecake.jpg', NOW(), 'aniversara', 1);
+
+
+views.py o sa avem:
+from aplicatie.models import Prajitura #Importă modelul din aplicația ta.
+def prajituri(request):
+    prajituri = Prajitura.objects.all()
+    return render(request, 'first_app/prajituri.html', {'prajituri': prajituri})
+
+prajituri.html
+<!-- aplicatia_ta/templates/prajituri.html -->
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Prajituri</title>
+</head>
+<body>
+    <h1>Lista de Prajituri</h1>
+    <ul>
+        {% for prajitura in prajituri %}
+            <li>
+                <strong>{{ prajitura.nume }}</strong><br>
+                Descriere: {{ prajitura.descriere }}<br>
+                Preț: {{ prajitura.pret }} RON<br>
+                Gramaj: {{ prajitura.gramaj }} g<br>
+                Calorii: {{ prajitura.calorii }} kcal<br>
+                {{ prajitura.categorie }}<br>
+                Disponibil pentru diabetici: {{ prajitura.pt_diabetici|yesno:"Da,Nu" }}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
