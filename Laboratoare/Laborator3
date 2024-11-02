@@ -1,0 +1,149 @@
+Setarea bazei de date
+Adaugam in PostgreSQL
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {
+                'options': '-c search_path=django'
+        },
+        'NAME': 'proiect1234',   # numele bazei de date
+        'USER': 'stefanteodor',      # username pt conexiunea la baza de date
+        'PASSWORD': 'stefanteodor',
+        'HOST': 'localhost',  # sau IP-ul serverului
+        'PORT': '5432',       # portul implicit pentru PostgreSQL
+    }
+}
+Adaugam aplicatie in INSATLLED APPS
+'aplicatie'
+
+pip install psycopg2
+
+Rulam in SQL
+CREATE USER stefanteodor WITH ENCRYPTED PASSWORD 'stefanteodor';
+GRANT ALL ON DATABASE proiect1234 TO stefanteodor ;
+GRANT ALL ON SCHEMA django to stefanteodor ;
+ALTER ROLE stefanteodor SET search_path = django,public;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA django TO stefanteodor ;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA django TO stefanteodor;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA django TO stefanteodor;
+
+Rulam apoi:
+python manage.py makemigrations nume_aplicatie
+python manage.py migrate
+
+Aplicatiile django predefinite
+django.contrib.admin: #activează interfața de administrare Django, care permite vizualizarea și gestionarea datelor din proiect.
+django.contrib.auth: #se ocupă de autentificare, autorizare și gestionarea utilizatorilor.
+django.contrib.contenttypes: #necesară pentru tipuri de conținut generice, permițând lucrul cu diverse modele de date.
+django.contrib.sessions: #gestionează sesiunile utilizatorilor, astfel încât aceștia să rămână conectați.
+django.contrib.messages: #oferă o modalitate de a afișa mesaje temporare utilizatorilor.
+django.contrib.staticfiles: #gestionează fișierele statice, precum CSS, imagini și JavaScript.
+
+
+Modele:
+Intram in models.py
+Modelele reprezintă componente esențiale ale structurii aplicației, fiind clase Python care definesc structura și comportamentul datelor din baza de date. 
+Fiecare model corespunde unei tabele din baza de date și fiecare atribut al unui model reprezintă o coloană în acea tabelă.
+Modelele se definesc prin clase în fișierul models.py al unei aplicații. Fiecare model trebuie să fie o subclasă a clasei models.Model oferite de Django
+Fiecare model definește ce date sunt stocate, tipul și restricțiile fiecărui câmp.
+Fiecare atribut al unui model corespunde unui tip de câmp care definește tipul de date stocat în baza de date. 
+Django oferă automat o interfață API (Object-Relational Mapping - ORM) pentru a crea, citi, actualiza și șterge datele din baza de date fără a scrie manual cod SQL.
+Pentru a crea tabelele în baza de date, Django utilizează un sistem de migrații care aplică modificările aduse modelelor în structura bazei de date.
+
+Tipuri de Campuri:
+1.CharField: Câmp pentru texte scurte, cum ar fi numele sau titlurile. Necesită specificarea proprietății max_length (lungimea maximă).
+nume = models.CharField(max_length=100)
+2.TextField: Câmp pentru texte mai lungi, de exemplu descrieri sau articole. Nu are limită de caractere specifică.
+descriere = models.TextField()
+3.BooleanField: Câmp pentru valori True sau False
+livrare_curier = models.BooleanField()
+4.IntegerField: Stochează numere întregi (între -2147483648 și 2147483647)
+stoc = models.IntegerField()
+5.FloatField: Stochează numere zecimale, cu virgulă mobilă.
+pret = models.FloatField()
+6.DecimalField: Stochează numere zecimale fixe. Necesită argumentele max_digits (numărul maxim de cifre) și decimal_places (numărul de cifre după zecimală).
+cantitate = models.DecimalField(max_digits=10, decimal_places=2)
+7.PositiveIntegerField: Numere întregi pozitive.
+count = models.PositiveIntegerField()
+8.DateField: Câmp pentru date calendaristice. Poate fi setat cu auto_now (salvează automat data curentă la fiecare actualizare) și auto_now_add (salvează data doar la creare).
+data_nasterii = models.DateField()
+9.TimeField: Câmp pentru ore și minute.
+timp_start = models.TimeField()
+10.DateTimeField: Câmp pentru dată și timp complet. Acceptă și argumentele auto_now și auto_now_add.
+data_creare = models.DateTimeField(auto_now_add=True)
+11.DurationField: Câmp pentru a stoca durate de timp (diferențe de timp), reprezentate ca obiecte timedelta din Python. În PostgreSQL se stochează cu tipul de date interval. Exemple: intervale de timp precum durata unei activități, durata unei sesiuni sau timpul petrecut pe un anumit task.
+durata = models.DurationField()
+Adaugam in setting.py daca vrem sa adaugam fisiere sau imagini:
+MEDIA_ROOT = BASE_DIR / 'media'  # Directorul unde se stochează fișierele
+MEDIA_URL = '/media/'            # URL-ul pentru accesarea fișierelor
+12.FileField: Câmp pentru încărcarea fișierelor (cum ar fi documente PDF, imagini, videoclipuri, fișiere text etc.) în cadrul unui model. Necesită configurarea parametrului upload_to pentru a defini unde se vor salva fișierele.Crearea câmpului (fișierele încărcate sunt salvate în subdirectorul media/documente/):
+document = models.FileField(upload_to='documente/')
+13.ImageField: Similar cu FileField, dar verifică dacă fișierul este o imagine validă.
+image = models.ImageField(upload_to='images/')
+14.ForeignKey: Definește o relație one-to-many. Necesită argumentul on_delete, care specifică ce se întâmplă când elementul referențiat este șters.
+autor = models.ForeignKey(Author, on_delete=models.CASCADE) #models.CASCADE inseamnca ca daca stergem o instanta din Author toate instantele din relatie one-to-many o sa fie sterse
+15.OneToOneField: Definește o relație one-to-one.
+profil = models.OneToOneField(Utilizator, on_delete=models.CASCADE)
+16.ManyToManyField: Definește o relație many-to-many.
+categorii = models.ManyToManyField(Categorie)
+17.EmailField: Câmp pentru email-uri. Validează automat formatul email-ului.
+email = models.EmailField()
+18.URLField: Câmp pentru URL-uri. Validează formatul URL-ului.
+website = models.URLField()
+19.SlugField: Câmp pentru slug-uri, adică formate text folosite în URL-uri.
+slug = models.SlugField()
+20.UUIDField: Câmp pentru identificatori unici universali (UUID), util pentru ID-uri unice.
+uuid = models.UUIDField()
+
+
+Parametri Generali ai Campurilor pentru modele
+1.null
+Permite stocarea valorii NULL în baza de date pentru acel câmp.
+Valoare implicită: False
+descriere = models.TextField(null=True)
+2.blank
+Permite câmpului să fie lăsat gol în formulare (valabil pentru validarea din Django, nu în baza de date). Dacă un câmp are blank=True, nu este necesar să aibă și null=True (decât dacă vrem să fie gol și în baza de date).
+Valoare implicită: False
+titlu = models.CharField(max_length=100, blank=True)
+3.default
+Specifică o valoare implicită pentru acel câmp.
+status = models.CharField(max_length=20, default='draft')
+4.unique
+Asigură unicitatea valorilor în baza de date pentru acel câmp.
+Valoare implicită: False
+email = models.EmailField(unique=True)
+5.primary_key
+Definește câmpul ca fiind cheia primară a tabelei.
+Valoare implicită: False
+Dacă nu specificăm niciun câmp cu primary_key=True, Django va crea automat un câmp id de tip AutoField.
+code = models.CharField(max_length=10, primary_key=True)
+6.Choices: permite definirea câmpurilor cu alegeri predefinite, utile pentru valori discrete. Este de obicei utilizat cu câmpuri de tip CharField sau IntegerField pentru a limita valorile posibile la un set definit.
+
+TIPURI_OPTIUNI = (
+    	('opt1', 'Opțiunea 1'),
+    	('opt2', 'Opțiunea 2'),
+)
+tip = models.CharField(max_length=5, choices=TIPURI_OPTIUNI)
+
+Opțiunile pot fi definite într-o manieră mai organizată, utilizând o clasă de tip Choices, care face codul mai ușor de citit și de întreținut. Acest lucru se face prin extinderea clasei TextChoices sau IntegerChoices
+
+class TipChoices(models.TextChoices):
+    	OPT1 = 'opt1', 'Opțiunea 1'
+    	OPT2 = 'opt2', 'Opțiunea 2'
+
+tip = models.CharField(max_length=5, choices=TipChoices.choices, default=TipChoices.OPT1)
+
+Exemplu:
+class ExempluModel(models.Model):
+    class NivelChoices(models.IntegerChoices):
+        INCEPATOR = 1, 'Începător'
+        INTERMEDIAR = 2, 'Intermediar'
+        AVANSAT = 3, 'Avansat'
+
+    nivel = models.IntegerField(
+        choices=NivelChoices.choices,
+        default=NivelChoices.INCEPATOR
+    )
+
+
+
