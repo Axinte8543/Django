@@ -145,5 +145,11 @@ class ExempluModel(models.Model):
         default=NivelChoices.INCEPATOR
     )
 
-
+Intram in admin.py
+from django.contrib import admin #importam modulul admin pentru a inregistra modelele in interfata de administrare
+from aplicatie.models import Topic, Webpage, AccessRecord,User #importam modelele
+admin.site.register(Topic) #intregistram modelul Topic in interfata de administrare Django, acest lucru permitand gestionarea modelului Topic(creare,citire,actualizare,stergere)
+admin.site.register(Webpage)
+admin.site.register(AccessRecord)
+admin.site.register(User)
 
