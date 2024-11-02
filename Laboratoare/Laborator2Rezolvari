@@ -1,0 +1,35 @@
+ct1=0    
+s1=0
+import re
+def aduna_numere(request,numar):
+    global ct1
+    global s1
+    if numar[-1].isdigit():
+       lista=re.findall(r'\d+',numar)
+    else:
+       return HttpResponse(status=500)
+    if len(lista)!=0:
+        ct1+=1
+        t=lista[-1]
+        s1=s1+int(t)
+        return HttpResponse(f"numar cereri: {ct1} suma numere: {s1}")
+    
+def afiseaza_liste(request):
+    params=request.GET
+    ul="<ul>"
+    t=""
+    r=""
+    for key, values in params.lists():
+        t=t+f"{key}:"
+        for value in values:
+            ul=ul+f"<li>{value}</li>"  
+        r=r+t+ul+"</ul>" 
+        ul="<ul>"
+        t=""
+    return HttpResponse(r)
+
+
+urlpatterns = [
+    re_path(r'^pag/(?P<numar>\w+)/$', views.aduna_numere, name="w"),
+    path("liste",views.afiseaza_liste,name="x"),
+]
