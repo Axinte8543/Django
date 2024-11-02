@@ -1,0 +1,73 @@
+Rute dinamice:
+urls.py:
+path("cale_dinamica/<int:nr>/<str:sir>/<path:subcale>/", views.afis_dinamica, name="dinamica")
+Ex:
+http://localhost:8000/aplicatie_exemplu/cale_dinamica/023/bobo/a/b/c/
+
+def afis_dinamica(request, nr,sir,subcale):
+    return HttpResponse(f"Numar: {nr} Sir: {sir} Subcale: {subcale}")
+
+In parametrul nr va intra valoarea 23, în sir "bobo" iar în subcale "a/b/c"
+
+
+Valori Multiple pentru un parametru:
+def cum_il_cheama(request):
+    lista_nume= request.GET.getlist('nume') #o sa contine [ionel,gigel,costel]
+    lista_nume= ("si "+" si ".join(lista_nume)) if lista_nume else "anonim"
+    return HttpResponse(f"Pe coleg îl cheama {lista_nume}")
+http://localhost:8000/aplicatie_exemplu/cum_il_cheama_pe_coleg/?nume=ionel&nume=gigel&nume=costel
+
+
+Caractere speciale in query string:
+? - delimitează începutul unui query string https://example.com/search?query=python
+# - e urmat de identificatorul pentru un element din document https://example.com/page#section1
+= separă un nume de parametru de valoarea lui https://example.com/search?query=python
+& separă două perechi de parametri cu eventuale valori asociate https://example.com/search?query=python&sort=asc
++ codifică un spațiu în cadrul unei valori de parametru https://example.com/search?query=python+programming adica vrei sa trimiti python programming si + este spatiu
+
+
+Expresii regulate in Python:
+ . Orice caracter (cu excepția liniei noi)
+? Zero sau o singură apariție a unui caracter sau grup
++ Una sau mai multe apariții ale unui caracter sau grup
+* Zero sau mai multe apariții ale unui caracter sau grup
+^ Începutul șirului
+$ Sfârșitul șirului
+|  (simbolul "pipe") - "sau" logic între expresii
+{ } Specifică numărul de apariții pentru caracterul sau grupul precedent. Se poate specifica un număr fix, de exemplu: a{3} înseamnă a repetat de exact 3 ori. Se poate specifica un număr minim de apariții: a{2,} cel puțin două repetări. Se pot specifica limita minimă și maximă: a{3,5} între 3 și 5 apariții.
+[abc], [a-z] Mulțimi de caractere. Oricare dintre caracterele "a", "b", "c", respectiv orice literă mică
+[^abc] Orice caracter care nu este în mulțime
+(abc) Parantezele grupează
+\ Este utilizat pentru caractere escape (de exemplu \. e caracterul "punct", \\ e chiar "backslash"), și pentru secvențe speciale precum cele de mai jos.
+\d orice cifră (echivalent cu [0-9]).
+\D orice caracter care nu este cifră (echivalent cu [^0-9])
+\w orice caracter alfanumeric (litere, cifre, underscore), echivalent cu [a-zA-Z0-9_]
+\W orice caracter care nu este alfanumeric (echivalent cu [^a-zA-Z0-9_])
+\s orice spațiu alb (inclusiv spațiu, tab, newline)
+\S orice caracter care nu este spațiu alb
+
+import re
+text = "xyzt 23abc 1014 abcd"
+rezultat = re.search(r'\d+', text) #primul numar gasit 23
+https://notepad.pw/bn2XKzZjvC8ZwkXwnDhG
+text = "abbacdaaaxyzb123"
+rezultate = re.findall(r'[ab]+', text) #toate sirurile care contin doar a si b
+
+re_path(r'^pagina/a{2,4}\d+/$', views.afisare_pag) #/pagina/aaa19
+re_path(r'^pagina/[xyz]+/$', views.afisare_pag2) #/pagina/xyxyzzz
+re_path(r'^pag_cod/(?P<id>\d{3})/$', views.afis_cod) #pag_cod urmat de un id care are exact 3 cifre pag_cod/123
+
+
+
+Templates
+def afis_template(request):
+    return render(request,"articole/articole.html",
+        {
+            "titlu_tab":"Titlu fereastra",
+            "titlu_articol":"Titlu afisat",
+            "continut_articol":"Continut text"
+        }
+    )
+
+
+
