@@ -50,7 +50,6 @@ Se poate specifica un număr minim de apariții: a{2,} cel puțin două repetăr
 import re
 text = "xyzt 23abc 1014 abcd"
 rezultat = re.search(r'\d+', text) #primul numar gasit 23
-https://notepad.pw/bn2XKzZjvC8ZwkXwnDhG
 text = "abbacdaaaxyzb123"
 rezultate = re.findall(r'[ab]+', text) #toate sirurile care contin doar a si b
 
