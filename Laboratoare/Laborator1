@@ -1,0 +1,93 @@
+1. Sa se scrie o pagina "/mesaj" care afiseaza textul "Buna ziua!"
+def index(request):
+    return HttpResponse("Buna ziua")
+
+
+2. Sa se scrie o pagina "/data" care afiseaza data si/sau ora curenta
+from datetime import date   
+def data(request):
+    return HttpResponse("Astazi este " + str(date.today()))
+
+
+3. Sa se scrie o pagina "/nr_accesari" care afiseaza numarul de accesari de cand a fost pornit serverul (in sesiunea curenta).
+ct=0
+def pag3(request):
+    global ct
+    ct+=1
+    return HttpResponse(f"<b>Am accesat pagina de {ct} ori</b>")
+
+
+4. Sa se scrie o pagina "/suma" care primeste 2 parametri a si b "/suma?a=2&b=25" si face suma lor. Valoarea lor default este 0
+suma=0
+def pag4(request):
+    global suma
+    c=request.GET.get("a",0) #cauta parametrul a in cererea get si daca il gasesc o sa ii dea lui c valoarea pe care o are, daca nu o gasesc o sa ii dea 0
+    b=request.GET.get("b",0)
+    c=int(c)
+    b=int(b)
+    suma=c+b
+    return HttpResponse(f"<b>Suma este</b>: {suma}")
+
+
+5. Sa se scrie o pagina "/text" care afiseaza toate valorile pe care le-a primit parametrul t pana atunci "/text?text=ceva" numai daca acestea sunt formate doar din litere. Pentru fiecare text se va scrie un alt paragraf.
+l1=[]
+def pag5(request):
+    global l1
+    text=request.GET.get("text")
+    if text and text.isalpha():
+        l1.append(text)
+    response_text = "".join(f"<p>{item}</p>" for item in l1)
+    return HttpResponse(response_text)
+
+
+6. Sa se scrie o pagina "/nr_parametri" care afiseaza cati parametri a primit.
+def pag6(request):
+    num_params = len(request.GET)
+    response_text = f"Numărul de parametri primiți este: {num_params}"
+    return HttpResponse(response_text)
+
+
+7. Sa se scrie o pagina "/operatie" care primeste doi parametri numerici si una dintre operatiile: sum, dif, mul, div, mod si afiseaza rezultatul.
+def pag7(request):
+    global numarfinal
+    try:
+        a=int(request.GET.get("a",0))
+        b=int(request.GET.get("b",0))
+    except ValueError:
+        return HttpResponse("Parametrii nu sunt numere întregi.", status=400)    
+    calcul=request.GET.get("calcul")
+    if calcul=="sum":
+        numarfinal=a+b
+    elif calcul=="dif":
+        numarfinal=a-b
+    elif calcul=="mul":
+        numarfinal=a*b
+    elif calcul=="div":
+        if b == 0:
+            return HttpResponse("Divizarea prin zero nu este permisă.", status=400)
+        numarfinal=a/b
+    elif calcul=="mod":
+        if b == 0:
+            return HttpResponse("Divizarea prin zero nu este permisă.", status=400)
+        numarfinal=a%b
+    else:
+        return HttpResponse("Operația specificată nu este validă.", status=400)    
+    return HttpResponse(f"<b>Rezultatul este</b>: {numarfinal}")   
+
+
+8. Sa se scrie o pagina "/tabel" care afiseaza intr-un tabel html datele dintr-o matrice (de 3 randuri si 4 coloane, cu ce vreti voi).
+def pag8(request):
+    matrice = [
+        ["A1", "B1", "C1", "D1"],
+        ["A2", "B2", "C2", "D2"],
+        ["A3", "B3", "C3", "D3"]
+    ]
+    tabel_html = "<table border='1'>"
+    for rand in matrice:
+        tabel_html += "<tr>"
+        for celula in rand:
+            tabel_html += f"<td>{celula}</td>"
+        tabel_html += "</tr>"
+    tabel_html += "</table>"
+    return HttpResponse(tabel_html)
+
