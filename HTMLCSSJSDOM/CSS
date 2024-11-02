@@ -1,0 +1,240 @@
+1.
+h1{
+     color:red;
+} #seteaza culoarea scrisului h1 sa fie rosu
+
+li{
+     color: rgb(255,97,0);
+} #seteaza culoarea scrisului li sa fie 255 rosu,97 green, 0 blue
+
+p{
+     color: #0895a8; 
+} #seteaza culoarea scrisului p sa fie culoarea 0895a8
+
+h4{
+     color: rgba(255,97,0,0.5) 
+}#seteaza culoarea scrisului h4 sa fie culoarea 255 red,97 green,0 blue,0,5 transparenta
+
+2.
+body{
+   background: url(http://www.sasasa.com/photo); # backgroundul sa aiba poza de la adresa aceasta
+   background-repeat:repeat; #imaginea va fi repetata orizontal
+}
+div{
+   background:blue; #backgroundul sa aiba culoarea albastra
+   border-color: orange; #bordura div-ului va avea culoarea portocalie
+   border-width: 4px; #grosimea bordurii va fi de 4px
+   border-style: double; #stilul bordurii va fi dublu(doua linii paralele)
+}
+
+p{
+   color:yellow;
+}
+
+span{
+   background: red;
+   color: black;
+}
+
+3.
+.firstDiv{
+  color:blue;
+} #deoarece avem . inainte de FirstDiv inseamna ca clasa FirstDiv va avea culoarea albastru
+.secondDiv{
+   color:red;
+} #deoarece avem . inainte de secondDiv inseamna ca clasa secondDiv va avea culoarea rosu
+
+#singledout{
+   color:green;
+   text-decoration: line-through;
+} #toate elementele care au id-ul singledout(avem # inainte) va avea culoarea verde si o linie trasata prin scris
+
+h3+ul{
+    border: 4px dotted purple;
+}
+#se va aplica o bordură punctată violet de 4px grosime pentru orice element <ul> care urmează imediat după un element <h3>
+
+li a{
+  color:red;
+} #orice element a care se afla intr-un li
+
+li a[href="www.npr.org"]{
+  color:blue;
+  border: 5px solid orange;
+} #afectează linkurile dintr-un element <li> care au atributul href exact egal cu "www.npr.org". Textul acestor linkuri va fi colorat în albastru, iar linkul va avea o bordură portocalie solidă de 5px.
+
+4.Ordinea de prioritati in CSS
+1.ID
+2.Class
+3.Li,Ul,body etc
+
+5.
+a:visited #este folosit pentru a stiliza linkurile pe care utilzatorul le-a vizitat ca sa nu apara diferit fata de linkurile neaccesate
+a:link #pentru a accesa linkurile neaccesate
+a:hover #pentru linkurile care sunt sub cursor
+a:active #pentru linkurile in momentul in care sunt clicate
+
+6.h1{
+       font-family:"Arial"; #fontul sa fie arial
+       text-align:center; #Textul din elementele <h1> va fi aliniat la centru
+}
+
+p{
+    font-family: monospace; #toate paragrafele vor utiliza un font monospace, unde toate caracterele au aceeasi latime
+}
+
+body{
+    font-size: 20px; #marimea fontului
+    font-style:italic; #fontul este italic
+    font-weight: bold; #fontul este bold
+}
+
+#two{
+   font-size: 1.0em; #va avea aceeasi marime ca fontul parinte, in cazul acesta cel mai probabul font-size
+}
+ 
+7.Daca vrem sa luam fonturi de pe net intram pe fonts.google.com si copiem de-acolo
+
+8.
+#top{
+   border: 4px solid blue; #creează o bordură albastră, de 4px, cu stil solid în jurul elementului
+   width: 25%; #elementul va avea o lățime de 25% din lățimea containerului părinte
+   text-align:center; 
+   margin: auto; #marginile laterale ale elementului vor fi setate automat, ceea ce va centra elementul orizontal în containerul său părinte. De exemplu id-ul o sa fie in centrul bodyului
+}
+#bottom{
+    border: 4px solid red;
+    width: 50%;
+    padding: 200px; #va adăuga un spațiu intern (padding) de 200px pe toate cele patru laturi (sus, jos, stânga, dreapta), ceea ce va mări dimensiunea interioară a elementului, distanțând conținutul de marginea interioară a elementului.
+    text-align: center;
+}
+
+9.
+  .Messipoza, .Haleppoza, .Bronnypoza, .handbal1, .liverpool, .denver
+{
+} #toate clasele vor avem aceeasi elemente de css
+
+ padding-top: 80px;/* Adaugă un spațiu de 80 de pixeli deasupra conținutului */
+
+ cursor:pointer; #vom avea un pointer cand suntem pe un obiect
+
+text-decoration #este utilizată pentru a aplica decorări vizuale textului, cum ar fi sublinierea, tăierea textului (linie prin mijloc), superscript, sau overline
+
+justify-content: space-between;
+    
+position: fixed;  #Elementul cu position: fixed va rămâne fixat în poziția sa chiar și atunci când utilizatorul face scroll pe pagină
+    
+top: 0;
+left: 0;
+right: 0; #distanta de margini
+
+align-items: start;  /*se va afla la primul rand al chenarului de sus in jos*/
+
+border-radius: 160px; #pentru a aplica colturi rotunjite unui element HTML
+
+z-index: 500; #ordinea de importanta
+
+box-shadow:10px 10px 20px rgba(0,0,0,0.6); #Proprietatea CSS box-shadow este folosită pentru a adăuga umbre în jurul elementelor, oferindu-le un efect tridimensional
+
+margin: 50px auto; /*va avea o distanta automata de 50 px de distanta fata de sus si o distanta de 50 px fata de distanta de jos*/
+
+overflow: hidden; /*folosim asta doar ca sa ne arate prima poza*/
+
+padding este spatiere pentru text
+
+@media (max-width: 980px) {
+      .center-section
+      {
+      margin-left:150px;
+      margin-right:250px;
+      }
+     #right-section
+      {
+      flex-direction:column;   
+      margin-left:-100px;
+      margin-right:0px;    
+      }
+  } #aceasta se va afecta cand fereastra google este mai mica decat 980 de pixeli pe latime
+
+vertical-align: top;  /*ne ajuta ca sa avem chestiile pe care le avem in aceeasi linie la acelasi nivel*/ 
+transition: opacity 0.15s; /*cat timp ii ia sa faca tranzitia spre opacity*/
+
+.subscribe-button:active {/*cand apesi pe buton*/
+      opacity: 0.5; /*luminozitatea butonului o sa scada de la 1 la 0.5*/
+ }
+
+object-fit: contain; #modul in care o imagine sau un videoclip se potriveste in container, contain este redimensionat cat sa se potriveasca complet in container,cover se umple complet containerul,none nu este redimensionat deloc si fill este insins sau micsorat ca sa umple containerul
+object-position: bottom; #unde in container se pozitioneaza
+
+.search-bar {
+display: block; /*elementul este afisat ca un bloc ocupand intreaga latime disponibila si incepand o noua linie,inline-block ia cat spatiu ii trebuie
+}
+
+.video-info-grid {
+display: grid; /* ne lasa sa punem in functie de linii si coloane*/
+grid-template-columns: 50px 1fr; /*prima chestie o fie 50 px,iar restul o sa ocupe restul de spatiu din marimea data*/
+}
+
+position: relative; /*În esență, position: relative; permite ajustarea poziției unui element fără să scoată acesta din fluxul normal al documentului, și este adesea utilizată în combinație cu position: absolute; pentru a poziționa elemente copil într-o manieră controlată și relativă.*/
+
+.video-grid {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;/*o sa ocupe fiecare o treime din marimea destinata*/
+column-gap: 16px; /*gapul intre coloane*/
+grid-row-gap: 40px; /*gapul intre randuri*/}
+
+position: absolute; /*cum avem de exemplu timpul de la youtube care trebuie sa ramana pe poza videoclipului cand se misca*/
+
+position: fixed; /*ca sa avem mereu sidebar si cand dam scroll sa nu dispara cum avem de exemplu la ytb*/
+
+pointer-events: none; #cand o sa avem cursorul mouseului unde ar trebui sa fie tranzitia nu o sa faca nimic
+white-space: nowrap; #ca sa nu se duca scrisul pe text
+
+/* Definirea animației */
+@keyframes miscare {
+  0% {background-color: roșu;
+         transform: translateX(0);}
+  50% {background-color: galben;
+           transform: translateX(50px);} #muta elementul cu 50px in dreapta
+  100% {background-color: verde;
+             transform: translateX(100px);} #muta elementul cu 100px in dreapta
+}
+
+/* Aplicarea animației pe un element */
+.element {
+  width: 100px;
+  height: 100px;
+  animation-name: miscare;      /* Numele animației definite */
+  animation-duration: 3s;       /* Durata animației */
+  animation-iteration-count: infinite; /* Animația se repetă la nesfârșit */
+  animation-timing-function: ease-in-out; /* Modifică viteza animației */
+}
+
+Flex:
+
+<body>
+    <div class="container">
+         <div class="item item-1">Item 1</div>
+         <div class="item item-2">Item 2</div>
+         <div class="item item-3">Item 3</div>
+    </div>
+</body>        
+
+.container
+{
+display:flex; #o sa mearga cele 3 item-uri ca rand
+flex-direction:column; #daca punem asta o sa fie in coloana
+justify-content: center; #este utilizată pentru a controla alinierea elementelor flex pe axa principală
+align-items:center; #controlează alinierea elementelor flex pe axa transversală 
+flex-wrap: wrap; #daca sunt multe iteme si incap cu greu pe o linie, asta o sa faca ca itemele sa se duca si pe alte linii
+align-content:center; #este utilizată pentru a controla alinierea liniilor de elemente flex atunci când există spațiu suplimentar pe axa transversală(adica este peste o linie de elemente)
+gap: 1em; #cat spatiu sa fie intre iteme
+}
+
+.item-1 {
+   flex-grow: 1; #determină capacitatea unui element de a crește pentru a umple spațiul disponibil în containerul flex, 0 elementul nu va creste,1 elementul va ocupa spatiul disponibil
+   flex-shrink:5; #determină capacitatea unui element de a se micșora atunci când spațiul disponibil în containerul flex este insuficient, 0 elementul nu se va modifica, 1 elementul se va micsora ca sa intre in container
+   flex-basis:300px; #definește dimensiunea inițială a unui element înainte de a se aplica orice creștere sau micșorare.
+   flex:1 2 300px; #face si flex-grow si flex-shrink si flex-basis
+   align-self:center #daca vreau ca elementul sa fie in centru axei transversale
+}
