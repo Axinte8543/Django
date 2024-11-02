@@ -1,0 +1,294 @@
+console.log("Hello from JavaScript!");
+console.log(typeof "Dave");
+console.log(typeof 42);
+console.log(typeof true);
+
+Lucram pe o singura variabila
+const MyVariable="Mathematic";
+console.log(MyVariable.length);
+console.log("cecsadas".length);
+console.log(MyVariable.charAt(5));
+console.log(MyVariable.indexOf("mat")); #Căută poziția primei apariții a substringului
+console.log(MyVariable.lastIndexOf("at")); #Căută poziția ultimei apariții a substringului
+console.log(MyVariable.slice(5,8));
+console.log(MyVariable.toLowerCase());
+console.log(MyVariable.includes("at"));
+console.log(MyVariable.split("e")); #math matic
+console.log("John,Joe,David".split(",")); #John Joe David
+
+Cum sa lucram cu variabilele
+const MyNumber=42;
+const MyFloat=42.01;
+const MyString="42";
+console.log(MyNumber==MyFloat); #va returna false
+console.log(MyNumber==MyString); #va returna true
+console.log(MyString+3); #va returna 423
+console.log(Number(MyString)+3);
+console.log(Number("dsds")); //NaN care inseamna Not a Number
+console.log(Number.isInteger(MyString));
+console.log(Number.parseFloat(MyString)); // returneaza un floating number
+console.log(MyFloat.toFixed(2)); //rotunjeste numarul la 2 zecimale
+console.log(Number.parseInt(MyString)); // returneaza un integer number
+console.log(MyFloat.toString()); //il face string
+//putem sa folosim mai multe metode in acelasi timp
+
+Functii matematice
+console.log(Math.PI);
+console.log(Math.trunc(Math.PI)); //returneaza integerul
+console.log(Math.round(Math.PI)); //returneaza numarul rotunjiy
+console.log(Math.ceil(Math.PI)); //returneaza numarul de sus
+console.log(Math.floor(Math.PI)); //returneaza numarul de jos
+console.log(Math.pow(5,2));
+console.log(Math.min(2, 0.5, 9));
+console.log(Math.random()); //returneaza un numar random de la 0 la 1
+
+const age= prompt("Enter your age") #Pune ti varsta sus si apoi o sa se salveze ca variabila
+
+2.
+
+alert("Welcome to your bank");
+const deposit= prompt("How mych would you like to deposit") 
+alert("You've deposited: "+ deposit)
+console.log("You are a cool person!")
+Integram in head-ul din html <script src="myscript.js"></script> ca sa putem sa folosim comenziile din myscript.js
+
+3.
+let soup="chicken noodle soup";
+if(soup){
+    reply= `Here's your order of ${soup}`;
+}
+else
+{
+ reply= `Sorry, we're out of soup.`;  
+}
+console.log(reply);
+let score=89;
+let grade;
+if(score>=85)
+  {grade="A"}
+
+
+let TestScore = 79;
+let myGrade =
+  TestScore > 89
+  ? "A"
+  : TestScore > 79
+  ? "B"
+  : TestScore > 69
+  ? "C"
+  : TestScore > 59
+  ? "D"
+  : "F";
+console.log(`My test grade is a ${myGrade}.`)
+// daca test score peste 89 mygrade va fi A si tot asa
+
+let myNumber=0;
+while(myNumber<50)
+{
+ myNumber++; 
+ console.log(myNumber);
+}
+
+for(let i=1;i<=10;i++)
+{
+ console.log(i);    
+}
+let name="Dave";
+let counter=0;
+name[counter];
+
+for (let i = 1; i <= 10; i++) {
+    if (i === 5) {
+        continue; // Sare peste numărul 5
+    }
+    console.log(i);
+}
+
+function sum(num1,num2)
+{ console.log(num1);
+  console.log(num2);    
+  return num1+num2;    
+}
+console.log(sum(2,3)); //functioneaza ca la C++
+
+
+3.
+const getUserNameForceEmail = (email) =>{
+  return email.slice(0, email.indexOf("@"));  
+};
+console.log(getUserNameForceEmail("dave@davesdomain.com"));
+//valoarea legata de const nu mai poate fi schimbata dupa initializare,deci getUserNameForceEmail
+
+Daca declaram o variabila let in while sau if nu putem sa o folosim in afara whileului sau ifului in let nu putem sa redeclaram nu avem voie sa facem let x=1; si apoi let x=2; pana la declararea numarului in let o sa primim ReferenceError
+Diferenta dintre let si const
+in const nu avem voie sa redeclarm deloc, o sa ramana mereu constanta
+
+4.
+const myArray=[];
+myArray[0]="Dave";
+myArray[1]=1001;
+myArray[2]=false;
+myArray.push("school"); //p sa adauge school in myArray
+const lastItem=myArray.pop(); //o sa puna in lastItem ultima valoare din myArray si o sa o stearga din vector
+myArray.indexOf("Dave"); #ne va arata la ce pozitie se afla dave
+
+myArray.unshift(42); //o sa puna prima valoare in vdctor, poti sa pui si mai multe variabile
+myArray.shift(); //elimina primul element al vectorului
+delete myArray[1]; //in loc de elementul de pe pozitia 1, o sa avem empty
+
+myArray.splice(1,2); //o sa elimine de la pozitia 1 incolo primele 2 elemente
+myArray.splice(1,0,"bananca",66); //o sa adauge de la pozitia 1 incolo banana si 66
+myArray.splice(1,1,"cherry") //o sa elimine elementul de pe pozitia 1 si il schimba cu cherry
+myArray.splice(2) //o sa elimine elementele de la pozitia 2 incolo
+
+let fruits = ["apple", "banana", "cherry"];
+
+let result = fruits.join(); #o sa il faca sir de caractere
+let result1 = fruits.join(" - "); //o sa fie apple - banana - cherry
+
+let str="apple,banana,cherry";
+let l = str.split(","); //l va fi ["apple", "banana", "cherry"]
+let str3 = "hello";
+let result2 = str.split(""); //result2 va fi ["h", "e", "l", "l", "o"]
+
+const myArrayA=["A","B","C"];
+const myArrayB=["D","E","F"];
+const newArray= myArrayB.concat(myArrayA);
+console.log(newArray); //["D", "E", "F", "A", "B", "C"]
+const sssss= [...myArrayA, ...myArrayB]; //["A", "B", "C", "D", "E", "F"]
+
+Matrice
+const newArray1=[myArrayA, myArrayB];
+console.log(newArray1[0][1]); //va fi o matrice si ne da B ["A","B","C"],["D","E","F"]
+const myArrayC=["D","E","F"];
+const newArray2=[newArray1, myArrayC];
+let elementA = newArray2[0][0][0];
+console.log(elementA); //ca sa accesam A
+
+5.
+Obiecte
+const anotherObj={
+    alive: true,
+    answer: 42,
+    hobbies: ["Eat", "Sleep", "Code"],
+    beverage:{
+     morning: "Coffee",
+     afternoon: "Iced Tea"    
+    },
+    action: function(){
+        return `Time for ${this.beverage.morning}`;
+    }
+};
+console.log(anotherObj.action());
+
+const vehicle={
+    wheels: 4,
+    engine: function(){
+        return "Vrroooom!";
+    }
+};
+const car=Object.create(vehicle); #car nu va avea proprietatiile din vehicle
+car.doors=4; #o sa creeze proprietatea doors care o sa ia valoarea 4
+car.engine=function(){ #suprascrie primul engine
+    return "Whoooosh";
+    
+};
+console.log(car.engine());
+console.log(car.wheels); #afiseaza 4
+console.log(car.doors);
+const tesla =Object.create(car);
+console.log(tesla.wheels); #o sa afiseze 4
+delete tesla.wheels;
+
+console.log(tesla.hasOwnProperty("wheels")); //daca are wheels o sa zica True,daca nu o sa zica False
+console.log(Object.keys(car)); //ne va arata cheile lui car ("doors","engine")
+console.log(Object.values(car)); //ne va arata valorile lui car (4,f)
+for (let components in band){
+    console.log(`On ${components}, it's $vechicle[components]}!`);
+}
+
+const {vocals, guitar, bass, drums}=band; //presupunem band o clasa cu cheiele alea
+console.log(guitar);
+console.log(vocals);
+
+6.
+Clase
+
+class Pizza {
+    #sauce = "traditional";  //daca are # inseamna ca este privata, putem sa avem si functii private
+     constructor(pizzaType, pizzaSize){
+     this.type=pizzaType;
+     this.size=pizzaSize;
+     this.crust="original";
+     this.toppings=[]
+    }
+    getCrust() {
+        return this.crust;
+    }
+    setCrust(pizzaCrust)
+    {
+        this.crust=pizzaCrust;
+    }
+    getToppings()
+    {
+        return this.toppings;    
+    }
+    setToppings(topping)
+    {
+        this.toppings.push(topping);    
+    }
+    bake(){
+        console.log(`Baking a ${this.size} ${this.type} ${this.crust} crust pizza.`);
+    }
+}
+class SpecialityPizza extends Pizza //mosteneste clasa Pizza
+{constructor(pizzaType, pizzaSize){
+    super(pizzaType, pizzaSize);  //super o sa apleze constructorul clasei pe care o mostenste
+    this.type= "The Works" ;
+}
+    slice(){
+      console.log(`Our ${this.type} ${this.size} pizza has 8 slices.`)   
+    }
+}
+const myPizza=new Pizza("pepperoni", "small");
+myPizza.setCrust("thin");
+myPizza.bake();
+myPizza.setToppings("sausage");
+myPizza.setToppings("olives");
+console.log(myPizza.getToppings());
+const mySpeciality = new SpecialityPizza("olive","medium");
+mySpeciality.slice();
+
+7.JSON
+JSON
+const myObj={
+    name: "Dave",
+    hobbies: ["eat", "sleep", "code"],
+    hello: function(){
+      console.log("Hello!");   
+    }
+};
+const sendJSON=JSON.stringify(myObj); #JSON.stringify() transformă obiectul myObj într-un șir JSON {"name":"Dave","hobbies":["eat","sleep","code"]}'
+console.log(sendJSON);
+console.log(typeof sendJSON); #string, acum este un sir de caractere
+console.log(sendJSON.name); //nu vom putea sa o alegem, deoarece este un sir si nu un obiect
+
+const receiveJSON=JSON); //object.parse(sendJSON); //face opusul lui stringify
+console.log(receiveJSON); { name: 'Dave', hobbies: [ 'eat', 'sleep', 'code' ] }
+console.log(typeof receiveJSON
+
+8.
+Handling Errors
+const makeError = () => {
+  try {
+      const name = "Dave";
+      name= "Joe";  
+   } catch (err) {
+     console.error(err); //daca in try avem vreo eroare ne va duce in catch si ne va spune ca este o eroare 
+     console.warn(err); //daca in try avem vreo eroare ne va duce in catch si ne va da un warning
+     console.table(err); //daca in try avem vreo eroare ne va duce in catch si ne va da un tabel ca eroare  
+     console.table(err.message); //daca in try avem vreo eroare ne va duce in catch si ne va da o eroare dar nu ne spune unde gresim 
+     console.table(err.stack); //daca in try avem vreo eroare ne va duce in catch si ne va da o eroare spunandu-ne unde gresim   
+   }  
+};
+  makeError();  
