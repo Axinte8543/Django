@@ -61,8 +61,29 @@ Un parametru (cu nume) în cadrul căii definite ca expresie regulată are sinta
 def ceva(request,id):
 
 Templates
+In settings.py o sa avem:
+TEMPLATE_DIR=os.path.join(BASE_DIR,"templates") #TEMPLATE_DIR este calea catre directorul templates din proiectul nostru 
+In Templates o sa avem :
+'DIRS': [TEMPLATE_DIR,], #TEMPLATE_DIR este calea catre directorul templates din proiectul nostru
+
+O sa avem un director templates pe care il creem in proiectul nostru in care o sa se afle un html
+
+articole.html
+<!DOCTYPE html>
+<html lang="ro">
+    <head>
+        <title>{{titlu_tab}}</title>
+    </head>
+    <body>
+        <h1>{{text|upper}}</h1> #dam upper la text filtru
+        <h1>{{number|add:99}}</h1> #adaugam 99 la numar filtru
+        <h1>{{titlu_articol}}</h1>
+        <p>{{continut_articol}}</p>
+    </body>
+</html>
+
 def afis_template(request):
-    return render(request,"articole/articole.html",
+    return render(request,"templates/articole.html",
         {
             "titlu_tab":"Titlu fereastra",
             "titlu_articol":"Titlu afisat",
@@ -70,5 +91,48 @@ def afis_template(request):
         }
     )
 
+{% if access_records %} #verifica daca contine date
+    <table>
+        <thead>
+            <th>Site Name</th>
+            <th>Date Accessed</th>
+         </thead>
+        {% for record in access_records %} #Folosește o buclă for pentru a parcurge fiecare element din access_records
+            <tr>
+                <td>{{ record.name }}</td>
+                <td>{{ record.date }}</td>
+            </tr>
+        {% endfor %}
+</table>
+    {% else %}
+        <h2>Sorry, no data available.</h2>
+{% endif %}  
 
+Extinderea templateurilor
+baza.html
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}Pagina mea{% endblock %}</title> #Titlul este pagina mea, dar poate fi suprascris
+    </head>
+    <body>
+        <header>
+            <h1>Site-ul meu</h1>
+        </header>       
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <footer>
+            <p>© 2024 Site-ul meu</p>
+        </footer>
+    </body>
+</html>
 
+ceva.html
+{% extends "baza.html" %}
+{% block title %}Pagina articolului{% endblock %}
+
+{% block content %} #blocul content din base.html va fi completat
+<h1>{{ title }}</h1>
+<p>{{ content }}</p>
+{% endblock %}
