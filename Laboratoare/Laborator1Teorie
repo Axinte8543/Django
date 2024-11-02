@@ -1,0 +1,57 @@
+Pentru a inițializa proiectul, folosim
+django-admin startproject [nume_proiect]
+Ca să pornim serverul rulăm:
+python manage.py runserver
+Pentru crearea unei aplicații:
+python manage.py startapp aplicatie_exemplu
+
+
+__init__.py - este un fișier specific pachetelor de python. Se execută atunci când este importat un pachet. Conține cod de inițializare.
+settings.py - fișierul cu setările aplicației
+urls.py - URL-urile aplicațiilor
+wsgi.py
+asgi.py
+
+Vom crea un prim view. Adaugam in views.py:
+from django.http import HttpResponse
+def index(request):
+	return HttpResponse("Primul raspuns")
+
+Pentru a putea lega acest răspuns de un endpoint, creăm fișierul urls.py:
+from django.urls import path
+from . import views
+urlpatterns = [
+	path("", views.index, name="index"),
+]
+
+Iar in fisierul urls.py din folderul proiectului:
+importăm include din django.urls
+adăugăm în lista urlpatterns elementul:
+path("aplicatie_exemplu/", include("aplicatie_exemplu.urls")),
+
+Pentru a accesa textul setat în funcția index, pornim serverul (dacă nu e deja pornit):
+python manage.py runserver
+
+
+Urls.py(aplicatie)
+#Fișierul urls.py al aplicației tale definește rutele URL specifice pentru acea aplicație și mapează aceste rute la funcțiile de vizualizare corespunzătoare din views.py.
+#Acest lucru permite Django să știe ce funcție de vizualizare să apeleze atunci când un utilizator accesează un anumit URL.
+#urlpatterns = [...]: Creează o listă numită urlpatterns care conține toate rutele URL pentru aplicație. Această listă este folosită de Django pentru a mapa URL-urile la funcțiile de vizualizare corespunzătoare.
+'''path("", views.index, name="index"): Definește o rută URL pentru calea rădăcină (""). Aceasta înseamnă că atunci când utilizatorul accesează URL-ul rădăcină al aplicației (http://127.0.0.1:8000/), Django va apela funcția index din modulul views.
+"": Calea URL pentru rădăcină.
+
+
+Urls.py(proiect)
+Fișierul urls.py este esențial pentru gestionarea rutelor URL în cadrul unui proiect Django. Acesta definește cum sunt mapate URL-urile către vizualizările (views) corespunzătoare. În esență, urls.py:
+Definește rutele URL pentru aplicația sau proiectul Django.Include alte configurații de URL-uri folosind funcția include, permițând organizarea modulară a rutelor.Permite gestionarea rutelor pentru interfața de administrare și alte aplicații din cadrul proiectului.
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    #Definește ruta URL pentru interfața de administrare Django. Când utilizatorul accesează /admin/, va fi redirecționat către interfața de administrare.
+    path('aplicatie/', include('aplicatie.urls')),
+    #Include toate URL-urile definite în aplicatie.urls sub prefixul aplicatie. De exemplu, dacă aplicatie.urls conține o rută path('pagina/', views.pagina), aceasta va fi accesibilă la /aplicatie/pagina/.
+    path('', include('aplicatie.urls')),
+    #Include toate URL-urile definite în aplicatie.urls la rădăcina site-ului. De exemplu, dacă aplicatie.urls conține o rută path('pagina/', views.pagina), aceasta va fi accesibilă la /pagina/.
+]
+
+
