@@ -1,0 +1,183 @@
+1.
+document.url #ca sa iti dea url-ul documentului
+document.body #ca sa iti dea body-ul documentului
+document.head #ca sa iti dea head-ul documentului 
+document.links #ca sa iti dea linkurile din document
+
+const view1 = document.getElementById("view1"); // va lua elementul care are atributul id=view1
+const view2 = document.querySelector("#view2"); // va lua primul element care are idul,clasa sau tagul =view2
+view1.style.display = "flex"; //va face view1 flex
+
+const views= document.getElementsByClassName("view"); //selecteaza toate elementele care au clasa view si returneaza un htmlcollection
+const sameViews = document.querySelectorAll(".view"); //selecteaza toate clasele care au clasa view si returneaza un nodelist(o colectie statica de elemente)
+//diferentele intre cele doua sunt ce returneaza, ca primul se actualizeaza daca un element din clasa view este adaugat sau eliminat din DOM, iar nodelist nu va actualiza automat si Nodelist poate sa selecteze si pe altceva in afara clasei ca de exemplu:p,atribute,div,etc
+
+const sameDivs=view1.getElementsByTagName("div"); //va lua in functie de tagname
+console.log(sameDivs);
+
+const evenDivs =view1.querySelectorAll("div:nth-of-type(2n)"); //va avea divurile care sunt divizibile cu 2
+console.log(evenDivs);
+for(let i=0; i< evenDivs.length; i++)
+    {evenDivs[i].style.backgroundColor ="darkblue";
+     evenDivs[i].style.width ="200px";    
+     evenDivs[i].style.height ="200px";   
+    }
+
+const navText=document.querySelector("nav h1"); //va lua nav h1 din html
+navText.textContent="Hello World!"; //schimba nav h1 in Hello World
+const navbar = document.querySelector("nav"); //selectam nav
+navbar.innerHTML= `<h1>Hello!</h1> <p>This should align right.`; //schimbam nav in asta
+navbar.style.justifyContent="space-between"; //vom face ca justifyContent sa fie space-between
+
+
+2.
+console.log(evenDivs[0]);
+console.log(evenDivs[0].parentElement); daca evendivs[0] e un div o sa arata elemntul ei parinte
+console.log(evenDivs[0].parentElement.children); // o sa arate copii
+console.log(evenDivs[0].parentElement.childNodes); // o sa arate childNodes
+console.log(evenDivs[0].parentElement.hasChildNodes); //vedem daca are
+console.log(evenDivs[0].parentElement.lastChild); //ultimul copil
+console.log(evenDivs[0].parentElement.lastElementChild); //ultimul elementcopil
+console.log(evenDivs[0].parentElement.firstChild); //primul copil
+console.log(evenDivs[0].parentElement.firstElementChild); //primul element copil
+console.log(evenDivs[0].nextSibling); //urmatorul frate
+console.log(evenDivs[0].nextElementSibling); //urmatorul elementfrate
+console.log(evenDivs[0].previousSibling);
+console.log(evenDivs[0].previousElementSibling);
+while (view2.lastChild){
+    view2.lastChild.remove();
+}
+
+
+3.
+const createDivs = (parent, iter) => {
+  const newDiv = document.createElement("div");    
+  newDiv.textContent= iter;    
+  newDiv.style.backgroundColor= "#230";    
+  newDiv.style.width= "100px";    
+  newDiv.style.height= "100px";    
+  newDiv.style.margin= "10px";    
+  newDiv.style.display= "flex";    
+  newDiv.style.justifyContent= "center";    
+  newDiv.style.alignItems= "center";   
+  parent.append(newDiv)    
+}
+for(let i=1;i<=12;i++)
+    {
+        createDivs(view2,i);
+    }
+
+
+4.
+EventListeners
+
+function initApp() {
+    const view = document.querySelector("#view2");
+    const div = view.querySelector("div");
+
+    // Adăugăm un event listener pentru click pe "view"
+    view.addEventListener("click", handleViewClick, true);
+}
+
+// Funcție care tratează evenimentul de click pe "view"
+function handleViewClick(event) {
+    event.stopPropagation();
+    event.currentTarget.style.backgroundColor = "purple";
+}
+
+// Adăugăm un event listener pentru schimbarea stării documentului
+document.addEventListener("readystatechange", handleReadyStateChange);
+
+// Funcție pentru a verifica starea "readyState"
+function handleReadyStateChange(event) {
+    if (event.target.readyState === "complete") {
+        console.log("readyState: complete");
+        initApp();
+    }
+}
+    
+function changeBackgroundColor() {
+    div.style.backgroundColor = "blue";
+}
+
+div.addEventListener("click", changeBackgroundColor, false); //daca avem exemplul asta o sa se face bkcol blue
+
+
+
+function toggleDivColor(event) {
+    const div = event.currentTarget; #Această linie obține referința la elementul care a generat evenimentul de "click" 
+    div.classList.toggle("blue"); # Această linie adaugă clasa "blue" la div dacă nu este deja prezentă; dacă clasa este deja prezentă, aceasta va fi eliminată.
+    div.classList.toggle("black"); #Similar, această linie adaugă clasa "black" la div dacă nu este deja prezentă; dacă este prezentă, aceasta va fi eliminată.
+}
+   const div = document.querySelector("div");
+   div.addEventListener("click", toggleDivColor, false);
+#Dacă div are clasa "blue", va fi eliminată și va fi adăugată clasa "black" (și invers).
+
+
+function toggleH2Text(event) {
+    const h2 = event.target;
+    const myText = h2.textContent; Această linie stochează textul curent al elementului h2 în variabila myText
+    h2.textContent = (myText === "My 2nd View") ? "Clicked" : "My 2nd View"; #Dacă myText este egal cu "My 2nd View", atunci textul va fi schimbat în "Clicked".
+															   #Dacă myText nu este egal cu "My 2nd View", atunci textul va fi schimbat în "My 2nd View".
+}
+    const h2 = document.querySelector("h2");   
+    h2.addEventListener("click", toggleH2Text, false);
+#Atunci când utilizatorul face click pe elementul h2, textul va alterna între "My 2nd View" și "Clicked". Dacă textul curent este "My 2nd View", acesta va deveni "Clicked" și invers
+
+
+
+function addNavHeight(event) {
+    event.target.classList.add("height100"); #Această linie adaugă clasa "height100" la elementul care a generat evenimentul (în acest caz, elementul nav) atunci când mouse-ul este deasupra lui.
+}
+function removeNavHeight(event) {
+    event.target.classList.remove("height100"); #Această linie elimină clasa "height100" de la elementul care a generat evenimentul atunci când mouse-ul iese de pe el
+}
+const nav = document.querySelector("nav");
+
+nav.addEventListener("mouseover", addNavHeight, false); 
+#Această linie adaugă un ascultător de evenimente pentru "mouseover" pe elementul nav.Când utilizatorul trece mouse-ul peste element, funcția addNavHeight va fi apelată, adăugând clasa "height100".
+nav.addEventListener("mouseout", removeNavHeight, false); 
+Această linie adaugă un ascultător de evenimente pentru "mouseout" pe elementul nav. Când mouse-ul iese de pe element, funcția removeNavHeight va fi apelată, eliminând clasa "height100"
+
+
+function handleFormSubmit(event) {
+    event.preventDefault(); 
+#Această linie oprește comportamentul implicit al formularului de a se trimite (adică de a reîncărca pagina sau de a naviga către o altă pagină).
+    console.log("submit event");
+}
+const myForm = view3.querySelector("#myForm");
+myForm.addEventListener("submit", handleFormSubmit, false);
+#Când utilizatorul trimite formularul, comportamentul implicit de trimitere va fi împiedicat (nu va reîncărca pagina) și mesajul "submit event" va fi afișat în consola browserului. Acest lucru îți permite să gestionezi datele din formular cu JavaScript, cum ar fi validarea datelor, trimiterea lor către un server prin AJAX sau orice altă logică specifică aplicației tale.
+
+
+5.
+Web Storiage
+
+const myObject={
+    name: "Dave",
+    hobbies: ["eat", "sleep", "code"],
+    logName: function (){
+       console.log(this.name);      
+    }
+};
+
+sessionStorage.setItem("mySessionStore", JSON.stringify(myObject)); //o sa avem in sessionStorage obiectul sub forma de string
+const mySessionData = JSON.parse(sessionStorage.getItem("mySessionStore")); // il va face obiect de tipul JS
+console.log(mySessionData);
+//daca salvam in sessionStorage o sa dispara cand terminam sesiunea, iar in localStorage o sa ramana mereu
+//ca sa stergi un item folosesti .removeitem sau clear() daca vrei sa stergi tot
+//localStorage.key(0) o sa iti arate prima valoare care se afla in localStorage de exemplu myLocalStore
+
+
+
+6.
+function greet() {
+    console.log('Hello, World!');
+}
+
+let timeoutID = setTimeout(greet, 2000); // "Hello, World!" va fi afișat după 2 secunde. 2000 reprezentand milisecundele
+function greet() {
+    console.log('Hello, again!');
+}
+
+let intervalID = setInterval(greet, 1000); // "Hello, again!" va fi afișat la fiecare secundă.
