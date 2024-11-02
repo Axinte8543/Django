@@ -1,0 +1,271 @@
+HTML
+1.<!DOCTYPE HTML> #documentul este in format HTML5
+<html lang="ro"> #elementul radacina al documentului in romana
+<head> #sectiunea in care se afla informatii despre document dar nu sunt afisate direct pe pagina
+<meta charset="UTF-8">     #setul de caracter folosit
+<title>Sportmav</title> #titlul de sus
+</head>
+<body> #corpul documentului
+</body>
+</html>
+
+2.
+<h1>This is a heading 1</h1> 
+<h2>This is a heading 2</h2> 
+<h3>Heading 3</h3> 
+<h6>Heading 6</h6>
+<p><strong>This is a text that is in bold</strong></p> 
+<p><em>This is a text that is in italics</em></p> 
+
+<h1> până la <h6> Sunt folosite pentru a crea titluri sau antete de diferite nivele.
+<h1> este cel mai mare si cel mai important folosit de obiecei ca titlul paginii
+<h2> mai mic si este folosit de obiecei ca subtitluri
+Restul sunt din ce in ce mai mici
+<p> reprezinta un paragraf de text, cu strong bolduim textul, iar cu em scriem italic
+
+3.<ol>
+       <li>First Item</li>
+       <li>Second Item</li>
+       <li>Third Item</li>
+   </ol>
+
+   <ul>
+       <li>First Item</li>
+       <li>Second Item</li>
+       <li>Third Item</li>
+   </ul>
+
+   <ol>
+      <li>Item One</li>
+      <li>Item Two</li>
+      <ul>
+         <li>I'm nested inside</li>
+         <li>Also nested!</li>
+         <ol>
+             <li>Woah>
+         </ol>
+      </ul>
+   </ol>      
+
+<ol> creeaza o lista ordonata unde fiecare element este numerotat
+<ul> creeaza o lista neordonata unde fiecare element are un marcaj(in loc sa fie numerotat)
+
+4.
+<div class="groupone">
+     <h1>Group One</h1>
+     <p>I want to <span>be together in</span> group one<p>
+</div>
+
+<div> este un element de tip container folosit pentru a grupa alte elemente împreună.
+Atributul class="groupone" atribuie div-ului o clasă numită "groupone". Aceasta permite stilizarea div-ului folosind CSS.
+
+5.
+<img src="image.jpg" alt="Imaginea unui peisaj montan">
+<a href="https://www.example.com">Acesta este un link către Example</a>
+
+src: Specifică calea (URL-ul) imaginii.
+alt: Text alternativ care apare în locul imaginii în cazul în care aceasta nu se poate încărca.
+href: Este obligatoriu și definește calea (URL-ul) către care duce link-ul.
+
+6.
+<table border="1">
+   <thead>
+      <tr>
+         <th>Number</th>
+         <th>Color</th>
+         <th>Country</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td>250</td>
+         <td>Red</td>
+         <td>USA</td>
+      </tr>
+      <tr>
+         <td>100</td>
+         <td>Blue</td>
+         <td>France</td>
+      </tr>
+   </tbody>
+</table>
+
+<table> creeaza un tabel
+<thead> definim antetul tabelului care contine elemente de tip <th>
+<tr> reprezinta o linie a tabelului
+<tbody> randurile de date din tabel
+<td> reprezinta o celula de date
+
+6.
+<form action="https://www.facebook.com/?locale=ro_RO" method="get">
+   <h1>Log in</h1>
+   <h2>Please Input your Email and Password</h2>
+
+   <input type="email" name="useremail" value="Email Here">
+   <input type="password" name="password" value="">
+   <input type="submit" name="" value="Click Me">
+</form>
+
+<form> reprezunta un formular HTML, utilizat pentru a colecta date de la utilizator si a le trimie catre un server pentru procesare
+action="https://www.facebook.com/?locale=ro_RO": Definește URL-ul ca sa ne trimita la adresa respectiva cand dam submit
+method="POST": Trimite datele folosind metoda POST
+<input type="email" name="useremail" value="Email Here"> #un camp ca adaugi adresa de email, name defineste numele campului si value este valoare predefinita afisata in campul de email
+<input type="password" name="password" value="">: #camp ca sa adaugi parola
+<input type="submit" value="Click Me">: #camp ca sa dai submit la valorile din formular
+<input type="text" name="username" placeholder="Enter your username"> #defineste tipul campului de intrare ca text
+
+7.
+<form>
+<label for="userinput">Enter Input:</label>
+
+<input id="userinput" type="text" name="" placeholder="Hello" required>
+</form>
+
+<label for="userinput">Enter Input:</label> #comanda asta o sa scrie pe aceeasi linie enter input si id-ul userinput
+<input id="userinput" type="text" name="" placeholder="Hello" required> #required deoarece este obligatoriu sa fie ceva scris in camd ca sa dam submit, iar placeholder ca sa avem o valoare predefinita
+
+8.
+<form method="get">
+<h3>Are you from inside the US? Or Outside the US?
+
+<label for="inusa>Inside: </label>
+<input id="inusa" type="radio" name="loc" value="">
+
+<label for="outusa>Outside: </label>
+<input id="outusa" type="radio" name="loc" value="">
+
+<h2>How was your service?</h2>
+<select name="stars"?
+     <option value="Great">3</option>
+     <option value="Okay">2</option>
+     <option value="Bad">1</option>
+
+</select>
+
+<h2>Any other feedback></h2>
+
+<textarea name="mytext" rows="8" cols="80"></textarea>
+
+<input type="submit" name="" value="SUBMIT">
+</form>
+
+<label for="inusa>Inside: </label>
+<input id="inusa" type="radio" name="loc" value="">
+#va face un camp pe aceeasi linie cu doua campuri Inside si Outside in care trebuie sa bifam
+<select> #partea cu select ne va da un camp in care vom vota 3,2 sau 1
+<textarea>: Permite introducerea de text lung, cu o dimensiune de 8 rânduri și 80 de coloane.
+
+<link rel="stylesheet" href="./styles/header.css"> #ca sa folosim css din styles/header.css
+#in HTML exista cai relative si cai absolute iar acesta este un exemplu de cale relativa
+
+ #Căile absolute sunt specificate începând cu rădăcina sistemului de fișiere sau cu rădăcina site-ului web.Căile relative sunt specificate relativ la locația actuală a paginii sau fișierului HTML care le folosește. ./ il folosim cand css-ul se afla in aceleasi director cu htmlul
+
+Diferenta dintre id si class:
+1.Id-ul are prioritate mai mare ca clasa
+2.Id-ul este unic in timp ce clasa poate fi aplicata la mai multe elemente dintr-o pagina HTML
+
+<br> indica HTML-ului sa faca o linie de pauza
+Ex:<p>This is the first line.<br>This is the second line.</p>
+Va afisa:
+This is the first line .
+This is the second line.
+
+9.<button class="btn btn-succes" type="button" name="button">I am On</button>
+#defineste un button, type="button" defineste ca e un buton simplu, name="button" ii da un nume butonului si ne ajuta cand folosim javascript, I am On este ce scrie pe buton
+
+   <button class="btn btn-succes" disabled="disabled" type="button" name="button">I am Off</button>
+#defineste un buton care este dezactivat
+
+<p class="apple-text">Shop early for the best selection of holiday favourites. <span class="shop-link">Shop now &#62;</span> </p>
+#Folosim span cand vrem doar ca o parte a paragrafului sa o modificam si asa facem si spatiu intre cuvinte mai mare
+
+<iframe width="400" height="400" src="https://www.youtube.com/embed/q_3d1x2VPxk"></iframe> #seteaza inaltimea si latimea la 400px, iar pe ecran o sa ne apara un videoclip de pe youtube cu embed
+
+<section>
+  <h2>Despre Noi</h2>
+  <p>Acesta este un scurt paragraf despre compania noastră și misiunea noastră.</p>
+</section>
+<section>
+  <h2>Servicii</h2>
+  <p>Oferim o gamă largă de servicii, inclusiv web development, design grafic și marketing digital.</p>
+</section> #<section> este un element semantic care este utilizat pentru a delimita o secțiune de conținut într-o pagină web
+
+<article>
+  <header>
+    <h2>De ce este importantă utilizarea elementelor semantice în HTML?</h2>
+    <p>Publicat pe 12 octombrie 2024 de <strong>Maria Popescu</strong></p>
+  </header>
+  <p>Utilizarea elementelor semantice în HTML aduce numeroase beneficii, inclusiv o mai bună accesibilitate.....</p>
+  <footer>
+    <p>Comentarii: 5 | Like-uri: 12</p>
+  </footer>
+</article>  #<article> este un element semantic folosit pentru a desemna conținut care poate fi distribuit independent de restul paginii.
+
+<div class="dropdown">
+       <button>Food</button?
+       <div class="content">
+              <a href="">Apple</a>
+              <a href="">Apple</a>
+              <a href="">Apple</a>
+              <a href="">Apple</a>
+       </div>
+</div>
+.dropdown{
+display:inline-block;
+}
+.dropdown button{
+      background-color: white;
+      color:blue;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+}
+.dropdown a{
+        display: block;
+        color: black;
+        text-decoration:none;   
+        padding:10px 15px;
+}           
+.dropdown .content{
+      display:none;
+      position: absolute;
+      background-color: white;
+      min-width:100 px;
+      box-shadow:2px 2px 5px black;
+}
+.dropdown:hover .content{
+        display: block;
+}
+.dropdown:hover button{
+      background-color: white;
+}
+.dropdown a:hover{
+      background-color:red;
+}
+
+
+<nav>
+  <ul>
+    <li><a href="#home">Acasă</a></li>
+    <li><a href="#despre">Despre</a></li>
+    <li><a href="#servicii">Servicii</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+nav {
+  background-color: #333;
+  padding: 10px;
+}
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+nav li {
+  display: inline;
+  margin-right: 20px;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+}
