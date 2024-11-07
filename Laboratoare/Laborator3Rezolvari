@@ -79,3 +79,60 @@ prajituri.html
         {% endfor %}
     </ul>
 </body>
+
+3.
+from django.db import models
+
+class Magazin(models.Model):
+     IDMagazin = models.PositiveIntegerField(primary_key=True, unique=True)
+     Judet = models.CharField(max_length=20)
+     Oras = models.CharField(max_length=20)
+     Cartier = models.CharField(max_length=20)
+     Strada = models.CharField(max_length=20)
+     Email = models.EmailField(default='example@gmail.com')
+     
+class Produs(models.Model):
+    IDProdus = models.PositiveIntegerField(primary_key=True, unique=True)
+    Magazine = models.ManyToManyField(Magazin)
+    
+class AlbumMuzical(models.Model):
+    IDAlbum = models.PositiveIntegerField(primary_key=True, unique=True)
+    IDProdus = models.OneToOneField(Produs, on_delete=models.CASCADE)
+    Titlu = models.CharField(max_length=50)
+    An = models.PositiveIntegerField()
+    Artist=models.CharField(max_length=30)
+    DurataAlbum = models.PositiveIntegerField()
+    NumarPiese= models.PositiveIntegerField()
+    GenAlbum = models.CharField(max_length=30)
+    Pret = models.DecimalField(max_digits=8, decimal_places=2)
+    EsteRomanesc = models.BooleanField()
+    
+class Film(models.Model):
+    IDFilm = models.PositiveIntegerField(primary_key=True, unique=True)
+    IDProdus = models.OneToOneField(Produs, on_delete=models.CASCADE)
+    Titlu = models.CharField(max_length=50)
+    ActorPrincial = models.CharField(max_length=40)
+    Gen = models.CharField(max_length=30)
+    EsteRomanesc = models.BooleanField()
+    Rating = models.CharField(max_length=10)
+    Pret = models.DecimalField(max_digits=8, decimal_places=2)
+    DescriereFilm = models.TextField()
+    
+class Carte(models.Model):
+    IDCarte = models.PositiveIntegerField(primary_key=True, unique=True)
+    IDProdus = models.OneToOneField(Produs, on_delete=models.CASCADE)
+    Titlu = models.CharField(max_length=40)
+    An = models.IntegerField()
+    Editura = models.CharField(max_length=25)
+    Autor = models.CharField(max_length=50)
+    NumarPagini = models.PositiveIntegerField()
+    Limba = models.CharField(max_length=30)
+    Pret = models.DecimalField(max_digits=8, decimal_places=2)
+    EsteRomaneasca = models.BooleanField()
+
+class RecenzieCarte(models.Model):
+    IDRecenzie = models.PositiveIntegerField(primary_key=True, unique=True)
+    IDCarte = models.ForeignKey(Carte, on_delete=models.CASCADE)
+    Nota = models.IntegerField()
+    Comentariu = models.TextField()
+    Data_Recenzie = models.DateField()
