@@ -1,0 +1,158 @@
+Un QuerySet care returnează toate obiectele din baza de date pentru modelul respectiv poate fi generat folosind Model.objects.all().
+from aplicatie_exemplu.models import Produs
+produse = Produs.objects.all()
+primele_trei = Produs.objects.all()[:3]
+
+Filtre:
+Pentru a obține obiecte care îndeplinesc anumite condiții, poți folosi metoda filter(), iar pentru a le exclude, folosim exclude(). Aceste funcții acceptă drept parametrii criterii de filtrare.O folosim in views.py
+Operatorii de filtrare principali:
+field__lt: mai mic decât
+field__lte: mai mic sau egal cu
+field__gt: mai mare decât
+field__gte: mai mare sau egal cu
+field__exact: valoare exactă
+field__iexact: valoare exactă, case-insensitive
+field__contains: conține
+field__icontains: conține, case-insensitive
+
+prod_sub_100 = Produs.objects.filter(pret__lt=100)
+prod_mai_mare_sau_egal_cu_100 = Produs.objects.exclude(pret__lt=100)
+
+Ex:
+def lista_prajituri(request):
+    prajituri = Prajitura.objects.all()
+    prod_sub_100= Prajitura.objects.filter(id__lt=100)
+
+
+
+Ordonarea rezultatelor:
+Se poate schimba ordinea în care sunt returnate obiectele folosind order_by(). Se poate specifica un câmp sau mai multe pentru sortare. Prefixul "-" ordonează descrescător.
+ordonate_dupa_pret = Produse.objects.order_by('pret')
+ordonate_dupa_nume_desc = Produse.objects.order_by('-name')
+
+
+Metode agregate
+QuerySet-urile Django au metode care permit operații agregate asupra datelor, precum suma, media, numărul, maximul și minimul.
+
+from django.db.models import Avg, Count
+
+pret_mediu = Produse.objects.aggregate(Avg('pret'))
+nr_prod = Produse.objects.count()
+
+Metoda aggregate() va returna un dicționar de valori pentru funcțiile specificate.
+
+
+
+Metode specifice QuerySet. Înlănțuire
+get(): returnează un singur obiect care îndeplinește criteriile, aruncând o excepție dacă nu este exact unul.
+first() și last(): returnează primul sau ultimul obiect din interogare.
+exists(): verifică dacă există cel puțin un obiect în QuerySet.
+Datorită evaluării leneșe, metodele QuerySet pot fi apelate în lanț pentru a construi interogări mai complexe fără a declanșa execuția acestora.
+produse = Produse.objects.filter(category='Electronice').order_by('pret')[:10]
+
+
+Relații Many-to-One și Many-to-Many
+Dacă un model are relații cu alte modele, Django permite navigarea ușoară prin aceste relații. Spre exemplu:
+produse = Produs.objects.get(id=1)
+nume_furnizor = produse.furnizor.nume
+
+Evită evaluarea prematură și utilizează select_related și prefetch_related pentru a optimiza interogările complexe:
+select_related(): pentru relațiile ForeignKey, face o interogare SQL JOIN.
+prefetch_related(): pentru ManyToManyField sau reverse ForeignKey.
+produse = Produs.objects.select_related('categorie').all()
+
+
+Executarea interogărilor brute cu raw()
+Dacă e nevoie de interogări SQL complexe, Django permite executarea SQL-ului brut cu metoda raw().
+carti = Carte.objects.raw(
+    "SELECT * \
+    FROM aplicatie_exemplu_carte \
+    WHERE autor = %s", ["J.K. Rowling"])
+
+
+
+Modul admin
+În Django, modul admin este o interfață predefinită pentru administrarea datelor din aplicație. Acest panou de administrare permite utilizatorilor (în special administratorilor și editorilor) să gestioneze datele aplicației fără a scrie cod. De asemenea, adminul Django este ușor de configurat și de personalizat.
+
+Pentru a crea un superutilizator cu scopul de a avea acces la panoul de administrare, se rulează comanda:
+python manage.py createsuperuser
+
+
+Personalizarea afișajului în modul admin
+Django permite o personalizare avansată a interfeței de admin, iar aceasta se face prin crearea unei clase de configurare, moștenită din admin.ModelAdmin, în admin.py
+Opțiuni de personalizare des folosite:
+	list_display: Specifică ce câmpuri să fie afișate în lista de obiecte din admin.
+	list_filter: Adaugă filtre laterale pentru a permite filtrarea datelor după anumite câmpuri.
+	search_fields: Adaugă un câmp de căutare care caută după anumite câmpuri definite.
+	ordering: Specifică ordinea implicită a obiectelor în listă.
+
+admin.py Exemplu:
+from django.contrib import admin
+from .models import Carte
+
+class CarteAdmin(admin.ModelAdmin):
+    list_display = ('titlu', 'autor', 'data_publicarii')  # afișează câmpurile în lista de obiecte
+    list_filter = ('autor', 'data_publicarii')  # adaugă filtre laterale
+    search_fields = ('titlu', 'autor')  # permite căutarea după anumite câmpuri
+
+admin.site.register(Carte, CarteAdmin)
+
+Secțiuni în formularul de administrare
+Dacă dorim să organizăm câmpurile în secțiuni sau să afișăm anumite câmpuri într-o anumită ordine, putem folosi fieldsets și fields.
+class CarteAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Informații Generale', {
+            'fields': ('titlu', 'autor')
+        }),
+        ('Date Publicare', {
+            'fields': ('data_publicarii',),
+            'classes': ('collapse',),  # secțiune pliabilă
+        }),
+    )
+
+
+Relații între modele în admin
+Adminul Django poate gestiona relații între modele, precum ForeignKey sau ManyToMany. Să presupunem că avem un model Editura și că fiecare Carte este asociată cu o Editură.
+
+class Editura(models.Model):
+    nume = models.CharField(max_length=100)
+
+class Carte(models.Model):
+    titlu = models.CharField(max_length=100)
+    autor = models.CharField(max_length=50)
+    data_publicarii = models.DateField()
+    editura = models.ForeignKey(Editura, on_delete=models.CASCADE)
+
+Dacă dorim să afișăm și editorul într-o listă a cărților, modificăm CarteAdmin
+class CarteAdmin(admin.ModelAdmin):
+    list_display = ('titlu', 'autor', 'editura', 'data_publicarii')
+    list_filter = ('autor', 'editura')  # filtrare și după editura
+
+
+Inlines (modele relaționale în aceeași pagină)
+Pentru relații de tip ForeignKey sau ManyToMany, poți folosi inlines pentru a afișa datele relaționate într-o singură pagină de administrare.
+
+Exemplu de TabularInline pentru a afișa toate cărțile publicate de un anumit editor pe pagina editorului.
+class CarteInline(admin.TabularInline):  # sau admin.StackedInline
+    model = Carte
+    extra = 1  # numărul de formulare goale suplimentare
+
+class EdituraAdmin(admin.ModelAdmin):
+    inlines = [CarteInline]
+
+admin.site.register(Editura, EdituraAdmin)
+
+
+Configurarea permisiunilor în admin
+Modul admin permite configurarea accesului pentru utilizatori. Putem seta ca anumite roluri să aibă acces complet sau restricționat la modele.
+Django vine cu permisiuni predefinite pentru fiecare model:
+	add: permite adăugarea de noi înregistrări.
+	change: permite editarea înregistrărilor.
+	delete: permite ștergerea înregistrărilor.
+	view: permite doar vizualizarea.
+
+Django permite personalizarea ușoară a interfeței admin, atât la nivel de text și logo, cât și la nivel de CSS.
+În fișierul admin.py, se pot adăuga titluri personalizate pentru interfața admin.
+admin.site.site_header = "Panou de Administrare Site"
+admin.site.site_title = "Admin Site"
+admin.site.index_title = "Bine ai venit în panoul de administrare"
