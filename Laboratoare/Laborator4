@@ -93,7 +93,7 @@ from .models import Carte
 class CarteAdmin(admin.ModelAdmin):
     list_display = ('titlu', 'autor', 'data_publicarii')  # afișează câmpurile în lista de obiecte
     list_filter = ('autor', 'data_publicarii')  # adaugă filtre laterale
-    search_fields = ('titlu', 'autor')  # permite căutarea după anumite câmpuri
+    search_fields = ('titlu', 'autor')  # permite căutarea după anumite câmpuri in /admin dupa titlu si autor
 
 admin.site.register(Carte, CarteAdmin)
 
