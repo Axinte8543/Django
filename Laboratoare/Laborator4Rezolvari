@@ -66,24 +66,24 @@ def filtrare(request):
     
     actor_principal = request.GET.get('actor_principal')
     if actor_principal:
-        filme = filme.filter(ActorPrincial__icontains=actor_principal) 
+        filme = filme.filter(ActorPrincial__iexact=actor_principal) 
     #daca parametrul actor_principal este prezent in Url, filtreaza filtrele pentru a include cele care au exact numele actorului
         
     ID_Film = request.GET.get('ID_Film')
     if ID_Film:
-        filme = filme.filter(IDFilm__icontains=ID_Film)
+        filme = filme.filter(IDFilm__iexact=ID_Film)
         
     ID_Produs = request.GET.get('ID_Produs')
     if ID_Produs:
-        filme = filme.filter(IDProdus__icontains=ID_Produs)
+        filme = filme.filter(IDProdus__iexact=ID_Produs)
         
     Titlu = request.GET.get('Titlu')
     if Titlu:
-        filme = filme.filter(Titlu__icontains=Titlu)
+        filme = filme.filter(Titlu__iexact=Titlu)
         
     Gen = request.GET.get('Gen')
     if Gen:
-        filme = filme.filter(Gen__icontains=Gen)
+        filme = filme.filter(Gen__iexact=Gen)
         
     EsteRomanesc = request.GET.get('EsteRomanesc')
     if EsteRomanesc:
@@ -91,11 +91,11 @@ def filtrare(request):
         
     Rating = request.GET.get('Rating')
     if Rating:
-        filme = filme.filter(Rating__icontains=Rating)
+        filme = filme.filter(Rating__iexact=Rating)
         
     DescFilm = request.GET.get('DescriereFilm')
     if DescFilm:
-        filme = filme.filter(DescriereFilm__icontains=DescFilm)
+        filme = filme.filter(DescriereFilm__iexact=DescFilm)
         
     paginator = Paginator(filme, 10)
     page_number = request.GET.get('page')
