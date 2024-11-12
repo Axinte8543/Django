@@ -13,7 +13,7 @@ field__gte: mai mare sau egal cu
 field__exact: valoare exactă 
 field__iexact: valoare exactă, nu conteaza literele mari sau mici
 field__contains: conține
-field__icontains: conține, case-insensitive
+field__icontains: conține, nu conteaza literele mari sau mici
 
 prod_sub_100 = Produs.objects.filter(pret__lt=100)
 prod_mai_mare_sau_egal_cu_100 = Produs.objects.exclude(pret__lt=100)
