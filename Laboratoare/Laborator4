@@ -38,6 +38,8 @@ from django.db.models import Avg, Count
 
 pret_mediu = Produse.objects.aggregate(Avg('pret'))
 nr_prod = Produse.objects.count()
+suma=filme.aggregate(Sum('Pret'))['Pret__sum'] #aggregate intoarce un dictionar al carei chei este [Pret_sum] si de aceea este nevoie sa o scriem
+
 
 Metoda aggregate() va returna un dicționar de valori pentru funcțiile specificate.
 
