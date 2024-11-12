@@ -4,9 +4,54 @@ Creati un super user pentru site-ul vostru.
 create superuser stefi8543
 
 Din panoul admin realizati interfete pentru toate modelele
+Intram in Admin
+
 Introduceti date pentru toate modelele.
+Intram in Admin
+
 Schimbati ordinea afisarii campurilor pentru minim unul dintre modele
+class AlbumMuzicalAdmin(admin.ModelAdmin):
+    ordering= ['-Pret']
+    fieldsets = (
+        ('Informații despre Album', {
+            'fields': ('Titlu', 'An','DurataAlbum','NumarPiese','GenAlbum','EsteRomanesc'),
+        }),
+        ('Altele', {
+            'fields': ('Artist','Pret'),
+        }),
+    )
+
+admin.site.register(AlbumMuzical,AlbumMuzicalAdmin)
+
 Pentru fiecare model faceti un camp de cautare (search field) dupa nume, sau alta coloana relevanta.
+class FilmAdmin(admin.ModelAdmin):
+      search_fields = ('Titlu','ActorPrincial') 
+
+admin.site.register(Film,FilmAdmin)
+
 Adaugati filtre laterale pentru minim un model
+class CarteAdmin(admin.ModelAdmin):
+    list_filter = ('Titlu', 'An') 
+
+admin.site.register(Carte,CarteAdmin)
+
+
 Minim un model sa aiba campurile impartite in minim 2 sectiuni
+class AlbumMuzicalAdmin(admin.ModelAdmin):
+    ordering= ['-Pret']
+    fieldsets = (
+        ('Informații despre Album', {
+            'fields': ('Titlu', 'An','DurataAlbum','NumarPiese','GenAlbum','EsteRomanesc'),
+        }),
+        ('Altele', {
+            'fields': ('Artist','Pret'),
+        }),
+    )
+
 Personalizati pagina de administrare schimband titlurile si headerul
+admin.site.site_header = "Panou de Administrare Site"
+admin.site.site_title = "Admin Site"
+admin.site.index_title = "Bine ai venit în panoul de administrare"
+
+
+
