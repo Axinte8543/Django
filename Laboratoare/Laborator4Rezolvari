@@ -71,11 +71,11 @@ def filtrare(request):
         
     ID_Film = request.GET.get('ID_Film')
     if ID_Film:
-        filme = filme.filter(IDFilm__iexact=ID_Film)
+        filme = filme.filter(IDFilm__gt=ID_Film)
         
     ID_Produs = request.GET.get('ID_Produs')
     if ID_Produs:
-        filme = filme.filter(IDProdus__iexact=ID_Produs)
+        filme = filme.filter(IDProdus__lte=ID_Produs)
         
     Titlu = request.GET.get('Titlu')
     if Titlu:
@@ -95,9 +95,9 @@ def filtrare(request):
         
     DescFilm = request.GET.get('DescriereFilm')
     if DescFilm:
-        filme = filme.filter(DescriereFilm__iexact=DescFilm)
+        filme = filme.filter(DescriereFilm__icontains=DescFilm)
         
-    paginator = Paginator(filme, 10) #creeaza un obiect Paginator care imparte filme in pagini de 10 filme fiecare
+    paginator = Paginator(filme, 5) #creeaza un obiect Paginator care imparte filme in pagini de 5 filme fiecare
     page_number = request.GET.get('page') #obtine numarul paginii curente de exemplu http://127.0.0.1:8000/aplicatiedjango/filtrare/?page=2, page_number va fi 2
     filme = paginator.get_page(page_number) #aceasta linie obtine obiectele pentru pagina curenta, daca page_number= None returneaza prima pagina
         
