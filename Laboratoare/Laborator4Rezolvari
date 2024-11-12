@@ -54,4 +54,86 @@ admin.site.site_title = "Admin Site"
 admin.site.index_title = "Bine ai venit în panoul de administrare"
 
 
+2.
+Task query sets (2p) PROIECT
+Pentru tabelul de produse faceti cate un filtru pentru fiecare dintre coloane folosind query sets. Alegeti voi modul de filtrare in functie de tipul de coloana.
+Implementati paginarea produselor (se vor afisa produsele pe pagini de cate 10, de exemplu, sau de cate 5).
 
+views.py
+def filtrare(request):
+    filme=Film.objects.filter(Pret__lt=26.99).order_by('Pret')
+    suma=filme.aggregate(Sum('Pret'))['Pret__sum']
+    
+    actor_principal = request.GET.get('actor_principal')
+    if actor_principal:
+        filme = filme.filter(ActorPrincial__icontains=actor_principal)
+        
+    ID_Film = request.GET.get('ID_Film')
+    if ID_Film:
+        filme = filme.filter(IDFilm__icontains=ID_Film)
+        
+    ID_Produs = request.GET.get('ID_Produs')
+    if ID_Produs:
+        filme = filme.filter(IDProdus__icontains=ID_Produs)
+        
+    Titlu = request.GET.get('Titlu')
+    if Titlu:
+        filme = filme.filter(Titlu__icontains=Titlu)
+        
+    Gen = request.GET.get('Gen')
+    if Gen:
+        filme = filme.filter(Gen__icontains=Gen)
+        
+    EsteRomanesc = request.GET.get('EsteRomanesc')
+    if EsteRomanesc:
+        filme = filme.filter(EsteRomanesc=True)
+        
+    Rating = request.GET.get('Rating')
+    if Rating:
+        filme = filme.filter(Rating__icontains=Rating)
+        
+    DescFilm = request.GET.get('DescriereFilm')
+    if DescFilm:
+        filme = filme.filter(DescriereFilm__icontains=DescFilm)
+        
+    paginator = Paginator(filme, 10)
+    page_number = request.GET.get('page')
+    filme = paginator.get_page(page_number)
+        
+    return render(request, 'aplicatiedjango/filtrare.html', {'filme': filme, 'suma': suma})
+
+
+filtrare.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista Film</title>
+</head>
+<body>
+    <h1>Lista Film</h1>
+    <ul>
+        {% for film in filme %}
+            <li>{{ film.Titlu }} - {{ film.ActorPrincipal }} - {{ film.Gen }} - {{ film.Pret }}</li>
+        {% endfor %}
+    </ul>
+    <p>Suma totală este {{ suma }}</p>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if filme.has_previous %}
+                <a href="?page=1">&laquo; prima</a>
+                <a href="?page={{ filme.previous_page_number }}">anterior</a>
+            {% endif %}
+
+            <span class="current">
+                Pagina {{ filme.number }} din {{ filme.paginator.num_pages }}.
+            </span>
+
+            {% if filme.has_next %}
+                <a href="?page={{ filme.next_page_number }}">următor</a>
+                <a href="?page={{ filme.paginator.num_pages }}">ultima &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</body>
+</html>
