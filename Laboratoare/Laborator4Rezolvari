@@ -1,0 +1,12 @@
+1.
+Task admin (2p) PROIECT
+Creati un super user pentru site-ul vostru.
+create superuser stefi8543
+
+Din panoul admin realizati interfete pentru toate modelele
+Introduceti date pentru toate modelele.
+Schimbati ordinea afisarii campurilor pentru minim unul dintre modele
+Pentru fiecare model faceti un camp de cautare (search field) dupa nume, sau alta coloana relevanta.
+Adaugati filtre laterale pentru minim un model
+Minim un model sa aiba campurile impartite in minim 2 sectiuni
+Personalizati pagina de administrare schimband titlurile si headerul
