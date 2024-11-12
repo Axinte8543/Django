@@ -66,7 +66,8 @@ def filtrare(request):
     
     actor_principal = request.GET.get('actor_principal')
     if actor_principal:
-        filme = filme.filter(ActorPrincial__icontains=actor_principal)
+        filme = filme.filter(ActorPrincial__icontains=actor_principal) 
+    #daca parametrul actor_principal este prezent in Url, filtreaza filtrele pentru a include cele care au exact numele actorului
         
     ID_Film = request.GET.get('ID_Film')
     if ID_Film:
