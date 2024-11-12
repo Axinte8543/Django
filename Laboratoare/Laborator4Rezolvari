@@ -97,9 +97,9 @@ def filtrare(request):
     if DescFilm:
         filme = filme.filter(DescriereFilm__iexact=DescFilm)
         
-    paginator = Paginator(filme, 10)
-    page_number = request.GET.get('page')
-    filme = paginator.get_page(page_number)
+    paginator = Paginator(filme, 10) #creeaza un obiect Paginator care imparte filme in pagini de 10 filme fiecare
+    page_number = request.GET.get('page') #obtine numarul paginii curente de exemplu http://127.0.0.1:8000/aplicatiedjango/filtrare/?page=2, page_number va fi 2
+    filme = paginator.get_page(page_number) #aceasta linie obtine obiectele pentru pagina curenta, daca page_number= None returneaza prima pagina
         
     return render(request, 'aplicatiedjango/filtrare.html', {'filme': filme, 'suma': suma})
 
@@ -118,23 +118,5 @@ filtrare.html
         {% endfor %}
     </ul>
     <p>Suma totală este {{ suma }}</p>
-
-    <div class="pagination">
-        <span class="step-links">
-            {% if filme.has_previous %}
-                <a href="?page=1">&laquo; prima</a>
-                <a href="?page={{ filme.previous_page_number }}">anterior</a>
-            {% endif %}
-
-            <span class="current">
-                Pagina {{ filme.number }} din {{ filme.paginator.num_pages }}.
-            </span>
-
-            {% if filme.has_next %}
-                <a href="?page={{ filme.next_page_number }}">următor</a>
-                <a href="?page={{ filme.paginator.num_pages }}">ultima &raquo;</a>
-            {% endif %}
-        </span>
-    </div>
 </body>
 </html>
