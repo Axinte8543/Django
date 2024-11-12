@@ -10,13 +10,16 @@ field__lt: mai mic decât
 field__lte: mai mic sau egal cu
 field__gt: mai mare decât
 field__gte: mai mare sau egal cu
-field__exact: valoare exactă
-field__iexact: valoare exactă, case-insensitive
+field__exact: valoare exactă 
+field__iexact: valoare exactă, nu conteaza literele mari sau mici
 field__contains: conține
 field__icontains: conține, case-insensitive
 
 prod_sub_100 = Produs.objects.filter(pret__lt=100)
 prod_mai_mare_sau_egal_cu_100 = Produs.objects.exclude(pret__lt=100)
+Filme.objects.filter(Titlu__exact="Avatar")  # doar filmele cu titlul exact "Avatar", "avatar" nu o sa mearga
+Filme.objects.filter(Titlu__contains="Av")  # filmele care conțin "Av" exact, cum ar fi "Avatar" sau "Avengers"
+
 
 Ex:
 def lista_prajituri(request):
@@ -40,9 +43,7 @@ pret_mediu = Produse.objects.aggregate(Avg('pret'))
 nr_prod = Produse.objects.count()
 suma=filme.aggregate(Sum('Pret'))['Pret__sum'] #aggregate intoarce un dictionar al carei chei este [Pret_sum] si de aceea este nevoie sa o scriem
 
-
 Metoda aggregate() va returna un dicționar de valori pentru funcțiile specificate.
-
 
 
 Metode specifice QuerySet. Înlănțuire
