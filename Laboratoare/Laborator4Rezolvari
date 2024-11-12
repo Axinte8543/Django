@@ -1,7 +1,7 @@
 1.
 Task admin (2p) PROIECT
 Creati un super user pentru site-ul vostru.
-create superuser stefi8543
+python manage.py createsuperuser
 
 Din panoul admin realizati interfete pentru toate modelele
 Intram in Admin
