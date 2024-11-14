@@ -1,0 +1,217 @@
+Formulare:
+
+Exemplu de formular in html:
+<form action="/submit_form" method="POST">
+    <label for="nume">Nume:</label>
+    <input type="text" id="nume" name="nume">
+
+    <label for="email">E-mail:</label>
+    <input type="email" id="email" name="email">
+
+    <button type="submit">Trimite</button>
+</form>
+action: URL-ul către care vor fi trimise datele formularului.
+method: metoda de trimitere a datelor (GET sau POST). GET trimite datele în URL (vizibil), iar POST trimite datele în fundal (mai sigur și recomandat pentru date sensibile).
+
+
+Clasa form:
+Clasa Form (din pachetul forms) este folosită pentru a crea formulare HTML, a gestiona datele introduse de utilizatori și a efectua validări.  Îl folosim în special pentru cazul în care dorim formulare independente de baza de date (altfel vom folosi forms.ModelForm).
+Un formular Django presupune definirea unei clase care moștenește clasa forms.Form. În această clasă, putem specifica câmpurile formularului, fiecare câmp fiind definit ca o instanță a unei clase de câmp specific (de exemplu, CharField, EmailField, etc.).
+
+Exemplu:
+Aduagam in forms.py
+from django import forms
+
+class ContactForm(forms.Form):
+    nume = forms.CharField(max_length=100, label='Nume', required=True)
+    email = forms.EmailField(label='Email', required=True) #valideaza automat daca inputul este un email valid
+    mesaj = forms.CharField(widget=forms.Textarea, label='Mesaj', required=True)
+
+label: textul care va apărea lângă câmpul respectiv.
+required: specifică dacă câmpul este obligatoriu.
+widget: permite personalizarea tipului de input (de exemplu, pentru un text mai lung, folosim forms.Textarea în locul input-ului standard).
+
+Adaugam in views.py
+from .forms import ContactForm
+
+def mesaj_trimis(request):
+    return HttpResponse("Mesajul s-a trimis")
+
+def contact_view(request):
+    if request.method == 'POST': #verifica daca formularul a fost trimis 
+        form = ContactForm(request.POST) #creeaza o instanta a formularului si ii transmite datele
+        if form.is_valid():  #daca formularul este valid
+            nume = form.cleaned_data['nume']
+            email = form.cleaned_data['email']
+            mesaj = form.cleaned_data['mesaj'] #cleaned_data contine datele din formular si ii atribuim fiecarui camp valoarea corespunaztoare pe care le folosim in continuare
+            return redirect('mesaj_trimis') #daca formularul este valid, utilizatorul e redirectionat la o pagina cu mesajul asta
+    else: #tipul de request este GET, inseamna ca cererea vine din accesarea paginii
+        form = ContactForm() #form va primi o instanta goala a formularului
+    return render(request, 'aplicatie_exemplu/contact.html', {'form': form}) #afiseaza contact.html si trimie instanta de formular form si va afisa formularul pentru a fi completat sau pentru a arata erori
+
+Contact.html o sa contina
+<form method="post"> #metoda formularului 
+    {% csrf_token %} #token de securitate folosit de Django pentru a proteja aplicatiile web impotriva atacurilor
+    {{ form.as_p }} #va afisa formularul ca linii de paragrafe
+    <button type="submit">Trimite</button>
+</form>
+
+
+Validarea datelor in formular:
+Adaugam in forms.py
+def clean_email(self):
+        email = self.cleaned_data.get('email') #vom primi emailul
+        if not email.endswith('@domeniu.com'): #daca emailul nu se termina cu @domeniu.com
+            raise forms.ValidationError("Adresa de email trebuie să fie de la domeniu.com") #ne va da eroarea aceasta
+        return email
+
+class ContactForm(forms.Form):
+    nume = forms.CharField(
+        max_length=50,
+        error_messages={
+            'required': 'Numele de utilizator este obligatoriu.',
+            'max_length': 'Numele de utilizator nu poate depăși 50 de caractere.'
+        }
+    )
+    email = forms.EmailField(
+        error_messages={
+            'invalid': 'Introduceți o adresă de email validă.'
+        }
+    )
+
+def clean(self):
+        cleaned_data = super().clean() #apeleaza metoda clean care va rula toate validarile implicite pentruu campurile din formular
+        email = cleaned_data.get("email") #extrage valoarea email, iar get este folosit pentru a prelua valorile din dictionarul cleaned_data fara a ridica o eroare, chiar daca cheia nu exista
+        confirm_email = cleaned_data.get("confirm_email")
+        if email and confirm_email and email != confirm_email:
+            raise forms.ValidationError("Adresele de email nu coincid.")
+
+Tratarea erorilor in template
+<form method="post">
+    {% csrf_token %}
+    <div>
+        {{ form.nume.label_tag }} #De exemplu ne va da Nume:
+        {{ form.nume }} #numele campului in model
+        {% if form.nume.errors %} #daca numele din formular contine vreo eroare
+            <div class="error">{{ form.nume.errors }}</div>
+        {% endif %}
+    </div>
+    <div>
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {% if form.email.errors %}
+            <div class="error">{{ form.email.errors }}</div>
+        {% endif %}
+    </div>
+    <div>
+        {{ form.mesaj }}
+    </div>
+    <button type="submit">Trimite</button>
+     {% if form.errors %}
+         <div class="error">{{ form.errors }}</div>
+     {% endif %}
+</form>
+
+
+Iterarea prin campurile unui formular
+<form method="post" action="{% url 'trimite_date' %}">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label> #field.label este eticheta campului
+            {{ field }}
+            {% if field.errors %} #lista de erori de validare asociate
+                <div class="error">
+                    {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if field.help_text %} #textul de ajutor daca exista
+                <small>{{ field.help_text }}</small>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit">Salvează date</button>
+</form>
+
+
+Validatoare personalizate
+from django.core.exceptions import ValidationError
+
+def validate_only_letters(value):
+    if not value.isalpha():
+        raise ValidationError("Acest câmp trebuie să conțină doar litere.")
+
+class ContactForm(forms.Form):
+    nume = forms.CharField(validators=[validate_only_letters])
+
+
+ModelForm
+ModelForm este o clasă Django care leagă un formular de un model din baza de date, astfel încât să fie create automat câmpuri pe baza atributelor modelului. Avantajul major al utilizării ModelForm este că se economisește timp și se evită codul redundant pentru validări, deoarece:
+
+Exemplu de formular bazat pe un model:
+Avem modelul:
+class Carte(models.Model):
+    titlu = models.CharField(max_length=100)
+    autor = models.CharField(max_length=50)
+    pret = models.DecimalField(max_digits=10, decimal_places=2)
+    data_publicarii = models.DateField()
+In forms.py o sa adaugam
+from .models import Carte
+
+class CarteForm(forms.ModelForm):
+    class Meta:
+        model = Carte #modelul pe baza caruia se constuieste formularul si va utiliza campurile definite in modelul Carte
+        fields = ['titlu', 'autor', 'pret'] #specifica exact ce campuri din modelul Carte vor fi incluse in formular
+
+In views.py vom adauga:
+from django.shortcuts import render, redirect
+from .forms import CarteForm
+
+def creare_carte(request):
+    if request.method == 'POST':
+        form = CarteForm(request.POST)
+        if form.is_valid():
+            carte = form.save(commit=False) #salveaza instanta de model Carte, dar cu commit=False, ceea ce inseamnca ca instanta nu este salvata imediat in baza de date
+            carte.titlu = carte.titlu.capitalize() #modifica titlul astfel incat sa inceapa cu litera mare
+            carte.save() #salveaza instanta in baza de date
+            return redirect('listare_carti')  
+    else:
+        form = CarteForm()
+    return render(request, 'creare_carte.html', {'form': form})
+
+
+Avem acelasi template ca acel de la formulare generale
+
+Validari suplimentare
+class CarteForm(forms.ModelForm):
+    class Meta:
+        model = Carte
+        fields = ['titlu', 'autor', 'pret']
+
+    def clean_pret(self):
+        pret = self.cleaned_data.get('pret')
+        if pret <= 0:
+            raise forms.ValidationError("Prețul trebuie să fie pozitiv.")
+        return pret
+
+Personalizare etichetelelor si a mesajelor de eroare este la fel ca la formularele generale
+
+Campuri suplimentare
+class CarteForm(forms.ModelForm):
+    informatii_aditionale = forms.CharField(required=False)
+   
+    class Meta:
+        model = Carte
+        fields = ['titlu', 'autor', 'pret', 'informatii_aditionale']
+
+
+Formset
+Un formset în Django este o colecție de formulare multiple de același tip, grupate împreună pentru a fi gestionate ca un singur obiect. Formset-urile sunt utile atunci când dorim să lucrăm cu o serie de instanțe ale unui formular – de exemplu, dacă dorim să adăugăm sau să edităm mai multe obiecte în același timp.
+
+from django import forms
+
+class ContactForm(forms.Form):
+    nume = forms.CharField(max_length=100)
+    email = forms.EmailField()
