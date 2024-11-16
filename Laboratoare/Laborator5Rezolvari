@@ -16,7 +16,7 @@ def filme123(request):
         form = Filme(request.POST)
         if form.is_valid():
             if form.cleaned_data['IDFilm']:
-                filme = filme.filter(IDFilm=form.cleaned_data['IDFilm'])
+                filme = filme.filter(IDFilm=form.cleaned_data['IDFilm']) #Verifică dacă câmpul IDFilm din formular a fost completat.Dacă da, filtrează queryset-ul filme pentru a include doar filmele care au IDFilm egal cu valoarea specificată în formular.
             if form.cleaned_data['IDProdus']:
                 filme = filme.filter(IDProdus=form.cleaned_data['IDProdus'])
             if form.cleaned_data['Titlu']:
