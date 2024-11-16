@@ -1,0 +1,71 @@
+1.class Filme(forms.Form):
+    IDFilm = forms.IntegerField(label='IDFilm', required=True)
+    IDProdus = forms.IntegerField(label='IDProdus', required=True)
+    Titlu = forms.CharField(max_length=50, label='Titlu', required=True)
+    ActorPrincipal = forms.CharField(max_length=40, label='ActorPrincipal', required=False)
+    Gen = forms.CharField(max_length=30, label='Gen', required=False)
+    EsteRomanesc = forms.BooleanField(label='EsteRomanesc', required=False)
+    Rating = forms.CharField(max_length=10, label='Rating', required=False)
+    Pret = forms.DecimalField(max_digits=8, decimal_places=2, label='Pret', required=False)
+    DescriereFilm = forms.CharField(widget=forms.Textarea, label='DescriereFilm', required=False)
+
+
+def filme123(request):
+    filme = Film.objects.all()
+    if request.method == 'POST':
+        form = Filme(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['IDFilm']:
+                filme = filme.filter(IDFilm=form.cleaned_data['IDFilm'])
+            if form.cleaned_data['IDProdus']:
+                filme = filme.filter(IDProdus=form.cleaned_data['IDProdus'])
+            if form.cleaned_data['Titlu']:
+                filme = filme.filter(Titlu__icontains=form.cleaned_data['Titlu'])
+            if form.cleaned_data['ActorPrincipal']:
+                filme = filme.filter(ActorPrincipal__icontains=form.cleaned_data['ActorPrincipal'])
+            if form.cleaned_data['Gen']:
+                filme = filme.filter(Gen__icontains=form.cleaned_data['Gen'])
+            if form.cleaned_data['EsteRomanesc'] is not None:
+                filme = filme.filter(EsteRomanesc=form.cleaned_data['EsteRomanesc'])
+            if form.cleaned_data['Rating']:
+                filme = filme.filter(Rating__icontains=form.cleaned_data['Rating'])
+            if form.cleaned_data['Pret']:
+                filme = filme.filter(Pret=form.cleaned_data['Pret'])
+            if form.cleaned_data['DescriereFilm']:
+                filme = filme.filter(DescriereFilm__icontains=form.cleaned_data['DescriereFilm'])
+            return redirect('mesaj_trimis')
+    else:
+        form = Filme()
+    paginator = Paginator(filme, 10)  
+    page_number = request.GET.get('page')
+    filme = paginator.get_page(page_number)    
+    return render(request, 'aplicatiedjango/filme.html', {'form': form})
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Proiect Django</title>
+</head>
+<body>
+      <form method="post">
+        {% csrf_token%}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+                {%if field.errors%}
+                    <div class="error">
+                    {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit">Trimite</button>
+    </form>    
+    </body>
+</html>
