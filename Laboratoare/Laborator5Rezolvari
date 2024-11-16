@@ -69,3 +69,116 @@ def filme123(request):
     </form>    
     </body>
 </html>
+
+
+2.def text(value):
+    if not value[0].isupper() or not all(char.isalpha() or char.isspace() for char in value):
+        raise ValidationError("Textul trebuie sa inceapa cu litera mare si sa contina doar litere")
+        
+class PaginaContact(forms.Form):
+    nume = forms.CharField(label='Nume', max_length=10, required=True, validators=[text])
+    prenume = forms.CharField(label='Prenume', validators=[text])
+    datanasterii = forms.DateField(label='Data nasterii', required=False)
+    email = forms.EmailField(label='Email', required=True)
+    confirmaremaiil = forms.EmailField(label='Confirmare email', required=True)
+    tipmesaj = forms.ChoiceField(label='Tip mesaj', choices=[('1', 'Reclamatie'), ('2', 'Intrebare'), ('3', 'Review'), ('4', 'Cerere'), ('5', 'Programare')])
+    subiect = forms.CharField(label='Subiect',required=True)
+    minimzileasteptare = forms.IntegerField(label='Minim zile asteptare', required=False)
+    mesaj = forms.CharField(widget=forms.Textarea, label='Mesaj (va rugam sa va semnati)', required=True, validators=[text])
+    
+    def clean_minimzileasteptare(self):
+        data = self.cleaned_data['minimzileasteptare']
+        if data < 0 and data!=None:   
+            raise forms.ValidationError("Numarul de zile nu poate fi negativ")
+        return data
+
+    def clean(self):
+            cleaned_data = super().clean() 
+            email = cleaned_data.get("email") 
+            confirm_email = cleaned_data.get("confirmareemail")
+            if email and confirm_email and email != confirm_email:
+                raise forms.ValidationError("Adresele de email nu coincid.")
+            return cleaned_data
+        
+    def datanasterii(self):
+        cleaned_data = super().clean()
+        data = self.cleaned_data['datanasterii']
+        if data:
+            cleaned_data['varsta'] = self.calculate_age(data)
+            del cleaned_data['datanasterii']
+        return cleaned_data
+    
+    def varsta(self):   
+        data=date.today()
+        nastere=self.cleaned_data('datanasterii')
+        years=data.year-nastere.year
+        months=data.month-nastere.month
+        if months<0:
+            years=years-1
+            months=months+12
+        if years<18:
+            raise forms.ValidationError("Trebuie sa ai minim 18 ani")  
+        return f'Varsta: {years} ani si {months} luni' 
+
+    def clean_mesaj(self):
+            mesaj = self.cleaned_data.get('mesaj')
+            words = re.findall(r'\b\w+\b', mesaj)
+            word_count = len(words)
+            if word_count < 5 or word_count > 100:
+                raise forms.ValidationError("Mesajul trebuie sa contina intre 5 si 100 cuvinte.")
+            mesaj = re.sub(r'\s+', ' ', mesaj.replace('\n', ' ')).strip()
+            return mesaj
+    
+    def mesaj1(self):
+        mesaj = self.cleaned_data.get('mesaj')
+        if mesaj.startswith('https://') or mesaj.startswith('http://'):
+            raise forms.ValidationError("Nu incepe mesajul cu https:// sau http://")
+        return mesaj
+
+    def mesaj2(self):
+        mesaj = self.cleaned_data.get('mesaj')
+        nume = self.cleaned_data.get('nume')
+        if not mesaj.endswith(nume):
+            raise forms.ValidationError("Mesajul trebuie sa se termine cu numele tau")
+        return mesaj
+
+
+
+def contact_view1(request):
+    if request.method == 'POST':
+        form = PaginaContact(request.POST)
+        if form.is_valid():
+            nume = form.cleaned_data['nume']
+            prenume = form.cleaned_data['prenume']
+            varsta = form.cleaned_data.get('varsta', 'N/A')
+            email = form.cleaned_data['email']
+            tipmesaj = form.cleaned_data['tipmesaj']
+            subiect = form.cleaned_data['subiect']
+            minimzileasteptare = form.cleaned_data['minimzileasteptare']
+            mesaj = form.cleaned_data['mesaj']
+
+            data = {
+                'nume': nume,
+                'prenume': prenume,
+                'varsta': varsta,
+                'email': email,
+                'tipmesaj': tipmesaj,
+                'subiect': subiect,
+                'minimzileasteptare': minimzileasteptare,
+                'mesaj': mesaj
+            }
+
+            timestamp = int(time.time())
+            
+            mesaje_folder = os.path.join(settings.BASE_DIR, 'myapp', 'mesaje')
+            os.makedirs(mesaje_folder, exist_ok=True)
+
+            file_name = f"mesaj_{timestamp}.json"
+            file_path = os.path.join(mesaje_folder, file_name)
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+
+            return redirect('mesaj_trimis')  
+    else:
+        form = PaginaContact()
+    return render(request, 'aplicatiedjango/contact.html', {'form': form})
