@@ -182,3 +182,124 @@ def contact_view1(request):
     else:
         form = PaginaContact()
     return render(request, 'aplicatiedjango/contact.html', {'form': form})
+
+
+
+
+
+3.
+def pozitiv(value):
+    if value < 0:
+        raise ValidationError("Numarul nu poate fi negativ")
+class AlbumMuzical(forms.ModelForm):
+    DurataAlbum = forms.IntegerField(label='DurataAlbum', required=True, validators=[pozitiv])
+    Pret = forms.DecimalField(max_digits=8, decimal_places=2, label='Pret', required=True, validators=[pozitiv])
+    Discount = forms.DecimalField(max_digits=8, decimal_places=2, label='Discount', required=False, validators=[pozitiv])
+    PretFinal = forms.DecimalField(max_digits=8, decimal_places=2, label='PretFinal', required=False, validators=[pozitiv])
+    class Meta:
+        model = AlbumMuzical
+        fields=['IDAlbum','IDProdus','Titlu', 'An', 'Artist', 'GenAlbum', 'NumarPiese','EsteRomanesc']
+        labels ={'IDAlbum':'IDAlbum',
+                 'IDProdus':'IDProdus',
+                 'Titlu':'Titlu', 
+                 'An':'An', 
+                 'Artist':'Artist', 
+                 'GenAlbum':'GenAlbum', 
+                 'NumarPiese':'NumarPiese',
+                 'EsteRomanesc':'EsteRomanesc'}
+        error_messages = {
+            'IDAlbum': {
+                'required': 'ID-ul albumului este obligatoriu.',
+                'invalid': 'Introduceți un număr valid.',
+            },
+            'IDProdus': {
+                'required': 'ID-ul produsului este obligatoriu.',
+                'invalid': 'Introduceți un număr valid.',
+            },
+            'Titlu': {
+                'required': 'Titlul albumului este obligatoriu.',
+                'max_length': 'Titlul nu poate avea mai mult de 100 de caractere.',
+            },
+            'An': {
+                'required': 'Anul lansării este obligatoriu.',
+                'invalid': 'Introduceți un an valid.',
+            },
+            'Artist': {
+                'required': 'Artistul este obligatoriu.',
+            },
+            'GenAlbum': {
+                'required': 'Genul albumului este obligatoriu.',
+            },
+            'NumarPiese': {
+                'required': 'Numărul de piese este obligatoriu.',
+                'invalid': 'Introduceți un număr valid.',
+            },
+            'EsteRomanesc': {
+                'required': 'Trebuie să specificați dacă albumul este românesc sau nu.',}
+        }
+    def cleanartist(self):
+        artist=self.cleaned_data.get('Artist')
+        if not artist[0].isupper() or not all(char.isalpha() or char.isspace() for char in artist):
+            raise forms.ValidationError("Artistul trebuie sa inceapa cu litera mare si sa contina doar litere")
+        return artist
+    def cleantitlu(self):
+        titlu = self.cleaned_data.get('Titlu')
+        if not re.match(r'^[a-zA-Z0-9\s\-,&]+$', titlu):
+            raise forms.ValidationError(
+                "Titlul poate conține doar litere, cifre, spații, '-', '&' sau ','."
+            )
+        return titlu
+    def genalbum(self):
+        genalbum = self.cleaned_data.get('GenAlbum')
+        genuri_permise = ['Rock', 'Pop', 'Hip-Hop', 'Jazz', 'Clasic', 'Country', 'Reggae', 'Folk', 'Metal', 'Electronic']
+        if genalbum not in genuri_permise:
+            raise forms.ValidationError(
+                f"Genul trebuie să fie unul dintre: {', '.join(genuri_permise)}."
+            )
+        return genalbum
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        pret = cleaned_data.get('Pret')
+        discount = cleaned_data.get('Discount')
+        pret_final = cleaned_data.get('PretFinal')
+
+        if discount is not None and pret is not None:
+            pret_final_calculat = pret - (pret * discount / 100)
+            if pret_final is None:
+                cleaned_data['PretFinal'] = pret_final_calculat
+            elif pret_final != pret_final_calculat:
+                raise forms.ValidationError("Prețul final nu corespunde cu prețul și discount-ul specificate.")
+
+
+
+def creare_album(request):
+    if request.method == 'POST':
+        form = AlbumMuzical(request.POST)
+        if form.is_valid():
+            album = form.save(commit=False)
+            album.DurataAlbum = form.cleaned_data['DurataAlbum']
+            album.Pret = form.cleaned_data['Pret']
+            album.Discount = form.cleaned_data.get('Discount', 0)
+            album.PretFinal = form.cleaned_data.get('PretFinal', album.Pret)           
+            album.save()
+            return redirect('mesaj_trimis')
+    else:
+        form=AlbumMuzical()
+    return render(request, 'aplicatiedjango/album.html', {'form': form})
+
+
+def creare_album(request):
+    if request.method == 'POST':
+        form = AlbumMuzical(request.POST)
+        if form.is_valid():
+            album = form.save(commit=False)
+            album.DurataAlbum = form.cleaned_data['DurataAlbum']
+            album.Pret = form.cleaned_data['Pret']
+            album.Discount = form.cleaned_data.get('Discount', 0)
+            album.PretFinal = form.cleaned_data.get('PretFinal', album.Pret)           
+            album.save()
+            return redirect('mesaj_trimis')
+    else:
+        form=AlbumMuzical()
+    return render(request, 'aplicatiedjango/album.html', {'form': form})
