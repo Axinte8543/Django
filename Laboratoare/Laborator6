@@ -1,0 +1,162 @@
+Modelul User:
+
+Include umratoarele infomatii:
+Date personale:
+username: identificator unic
+first_name si last_name: 
+email:
+Autentificare si autorizare
+password
+is_staff: indica daca utilizatorul poate accesa interfata de administrare
+is_superuser: daca utilizatorul are toate permisiunile
+is_active: daca este activ in momentul de fata
+Timp si metadate
+last_login: ultima autentificare
+data_joined: data crearii contului
+
+Formular de autentificare
+from django.contrib.auth.forms import AuthenticationForm --clasa predefinita si utilizata pentru autentificarea utilizatorilor
+class AuthenticationForm(forms.Form):
+      username = forms.CharField(max_length=254)
+      password = forms.CharField(label=("Parola"), strip= False, widget=forms.PasswordInput)
+
+Validarea in formularul de autentificare:
+def clean(self):
+    username = self.cleaned_data.get('username')
+    password = self.cleaned_data.get('password')
+   
+    if username is not None and password:
+        self.user_cache = authenticate(self.request, username=username, password=password) --verifica daca exista un utilizator cu combinatia asta
+        if self.user_cache is None: --daca self.user_cache este None, inseamnca ca datele de autentificare sunt incorecte
+            raise forms.ValidationError(
+                self.error_messages['invalid_login'],
+                code='invalid_login',
+                params={'username': self.username_field.verbose_name},
+            )
+    return self.cleaned_data
+
+Formular de autentificare personalizat
+Daca dorim sa adugam campuri suplimentare cum ar fi "Ramaneti logat"
+class CustomAuthenticationForm(AuthenticationForm):
+    ramane_logat = forms.BooleanField(
+        required=False,
+        initial=False,
+        label='Ramaneti logat'
+    )
+
+    def clean(self):        
+        cleaned_data = super().clean()
+        ramane_logat = self.cleaned_data.get('ramane_logat')
+        return cleaned_data
+
+View pentru formular de autentificare personalizat
+from django.contrib.auth import login
+from django.shortcuts import render, redirect
+from .forms import CustomAuthenticationForm
+
+def custom_login_view(request): --pe asta il folosim si pentru formularul de autentificare care nu e custom
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(data=request.POST, request=request) --punem formularul in form
+        if form.is_valid():
+            user = form.get_user() --punem userul
+            login(request, user)
+            if not form.cleaned_data.get('ramane_logat'): --daca nu bifam ramane_logat
+                request.session.set_expiry(0)
+            else: --daca bifam ramane_logat
+                request.session.set_expiry(2*7*24*60*60)  # 2 săptămâni în secunde            
+            return redirect('home')
+    else:
+        form = CustomAuthenticationForm()
+
+    return render(request, 'login.html', {'form': form})
+
+Logarea
+from django.contib.auth import login
+if user is not None:
+  login(request, user)
+  print("Utilizatorul a fost conectat.")
+
+from django.contrib.auth import logout
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+
+View folosind UserCreationForm Inregistrari
+
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
+
+def register_view(request):
+    if request.method == 'POST': --indica faptul ca utilizatorul a trimis formularul de intregistrare pentru procesare
+        form = UserCreationForm(request.POST) --instanta a formularului de intregistrare
+        if form.is_valid():
+            form.save()
+            return redirect('login') --dupa ce utilizatorul a fost creat e redirectionat la pagina de autentificare
+    else:
+        form = UserCreationForm() --daca metoda nu este POST inseamna ca utilizatorul vrea sa vada pagina de intregistrare si se creeaza un formular gol
+    return render(request, 'inregistrare.html', {'form': form}) --daca e vorba de un formular gol sau unul invalid
+
+Personalizarea UserCreationForm
+Daca dorim sa adaugam campuri suplimentare
+from django.contrib.auth.forms import UserCreationForm
+from django import forms
+from .models import CustomUser  # Model personalizat
+
+class CustomUserCreationForm(UserCreationForm):
+    telefon = forms.CharField(required=True)
+    class Meta:
+        model = CustomUser
+        fields = ("username","email", "telefon", "password1", "password2")
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.telefon = self.cleaned_data["telefon"]
+        if commit:
+            user.save()
+        return user
+In views.py este aceeasi chestie
+
+Validarile sunt la fel ca la formulare
+Schimbarea parolei (PasswordChangeForm):
+
+Views.py:
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+def change_password_view(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST) --user va utilizatorul curent conectat, data datele trimise prin formular
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, request.user) --Django valideaza schimbarea parolei ceea ce duce la deconectare, iar update actualizeaza token astfel incat utilzizatorul ramane conectat
+            messages.success(request, 'Parola a fost actualizata') --mesaj de succes
+            return redirect('home')
+        else:
+            messages.error(request, 'Exista erori.')
+    else:
+        form = PasswordChangeForm(user=request.user)
+    return render(request, 'schimba_parola.html', {'form': form})
+
+
+Cum creezi un utilizator nou:
+user= User.objects.create_user(username='Irina', email='irina@gmail.com', password='irina')
+superuser = User.objects.create_superuser(username='admin', email='admin@example.com', password='admin1234')
+
+Setarea parolei:
+user = User.objects.get(username='irina')
+user.set_password('parola_noua')
+user.save()
+user.check_password -- ca sa verificam daca parola e corecta
+
+Extinderea clasei Abstractuser
+Daca vrem ca modelul User din cadrul aplicatiei sa aiba mai multe date
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+class CustomUser(AbstractUser):
+  telefon = models.CharField(max_length=15, blank=True)
+
+In setting.py vom avea 
+AUTH_USER_MODEL = 'aplicatie_exemplu.CustomUser'
