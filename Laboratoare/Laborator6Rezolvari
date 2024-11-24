@@ -6,3 +6,281 @@ class CustomUser(AbstractUser):
     tara = models.CharField(max_length=20, blank=True)
     oras = models.CharField(max_length=20, blank=True)
     codpostal1 = models.CharField(max_length=6, blank=True)
+
+2.
+Veti crea un formular de inregistrare care cuprinde toate cele 5 campuri (plus cele implicite de date personale din modelul User implicit). 
+Pentru minim 3 din cele 5 campuri suplimentare va exista o formă de validare.
+
+class CustomUserCreationForm(UserCreationForm):
+    telefon = forms.CharField(max_length=10, required=False, label='Telefon')
+    adresa = forms.CharField(max_length=50, required=False, label='Adresa')
+    tara = forms.CharField(max_length=20, required=False, label='Tara')
+    oras = forms.CharField(max_length=20, required=False, label='Oras')
+    codpostal1 = forms.CharField(max_length=6, required=False, label='Cod Postal')
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'telefon', 'adresa', 'tara', 'oras', 'codpostal1']
+        labels = {
+            'username': 'Nume utilizator',
+            'first_name': 'Prenume',
+            'last_name': 'Nume',
+            'email': 'Email',
+            'password1': 'Parola',
+            'password2': 'Confirmare Parola',
+        }
+        error_messages = {
+            'username': {
+                'required': 'Numele de utilizator este obligatoriu.',
+                'max_length': 'Numele de utilizator nu poate avea mai mult de 150 de caractere.',
+            },
+            'email': {
+                'required': 'Adresa de email este obligatorie.',
+                'invalid': 'Introduceți o adresă de email validă.',
+            },
+            'password1': {
+                'required': 'Parola este obligatorie.',
+            },
+            'password2': {
+                'required': 'Confirmarea parolei este obligatorie.',
+            },
+        }
+
+    def clean_telefon(self):
+        telefon = self.cleaned_data.get('telefon')
+        if telefon and not telefon.isdigit():
+            raise forms.ValidationError("Numărul de telefon trebuie să conțină doar cifre.")
+        if telefon and len(telefon) != 10:
+            raise forms.ValidationError("Numărul de telefon trebuie să aibă exact 10 cifre.")
+        return telefon
+
+    def clean_codpostal1(self):
+        codpostal1 = self.cleaned_data.get('codpostal1')
+        if codpostal1 and not codpostal1.isdigit():
+            raise forms.ValidationError("Codul poștal trebuie să conțină doar cifre.")
+        if codpostal1 and len(codpostal1) != 6:
+            raise forms.ValidationError("Codul poștal trebuie să aibă exact 6 cifre.")
+        return codpostal1
+
+    def clean_adresa(self):
+        adresa = self.cleaned_data.get('adresa')
+        if adresa and len(adresa) < 5:
+            raise forms.ValidationError("Adresa trebuie să aibă cel puțin 5 caractere.")
+        return adresa
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.telefon = self.cleaned_data["telefon"]
+        user.adresa = self.cleaned_data["adresa"]
+        user.tara = self.cleaned_data["tara"]
+        user.oras = self.cleaned_data["oras"]
+        user.codpostal1 = self.cleaned_data["codpostal1"]
+        if commit:
+            user.save()
+        return user
+
+def register_view(request):
+    if request.method == 'POST': 
+        form = CustomUserCreationForm(request.POST) 
+        if form.is_valid():
+            form.save()
+            return redirect('custom_login_view') 
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'aplicatiedjango/inregistrare.html', {'form': form}) 
+
+
+inregistrare.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Înregistrare</title>
+</head>
+<body>
+    <h1>Înregistrare</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="error">
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit">Înregistrează-te</button>
+    </form>
+</body>
+</html>
+
+login.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Autentificare</title>
+</head>
+<body>
+    <h1>Autentificare</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="error">
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit">Autentificare</button>
+    </form>
+</body>
+</html>
+
+
+3.
+Veți crea un formular de login, si o optiune de logout. 
+Formularul de login va fi personalizat astfel incat sa tina minte utilizatorul logat timp de o zi.
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    ramane_logat = forms.BooleanField(
+        required=False,
+        initial=False,
+        label='Ramaneti logat'
+    )
+
+    def clean(self):        
+        cleaned_data = super().clean()
+        ramane_logat = self.cleaned_data.get('ramane_logat')
+        return cleaned_data
+
+
+def custom_login_view(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(data=request.POST, request=request)
+        if form.is_valid():
+            user = form.get_user() 
+            if user is not None:
+                login(request, user)
+                request.session['user_data'] = {
+                    'username': user.username,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'email': user.email,
+                    'telefon': user.telefon,
+                    'adresa': user.adresa,
+                    'tara': user.tara,
+                    'oras': user.oras,
+                    'codpostal1': user.codpostal1,
+                }
+                if not form.cleaned_data.get('ramane_logat'):
+                    request.session.set_expiry(0)
+                else: 
+                    request.session.set_expiry(24*60*60)           
+                return redirect('profile')
+    else:
+        form = CustomAuthenticationForm()
+
+    return render(request, 'aplicatiedjango/login.html', {'form': form})
+
+def custom_logout_view(request):
+    logout(request)
+    return redirect('custom_login_view')
+
+def home(request):
+    return render(request, 'aplicatiedjango/ceva.html')
+
+
+4.La login cu succes utilizatorul va fi redirectionat spre o pagina de profil unde isi va vedea datele din tabel (datele vor fi memorate in sesiune si vor fi 
+  afisate pe pagina de profil din cadrul sesiunii) si va avea si un link catre un formular in care isi va putea schimba parola.
+
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    class Meta:
+        model = CustomUser
+        fields = ['old_password', 'new_password1', 'new_password2']
+
+
+@login_required
+def profile(request):
+    user_data = request.session.get('user_data', {})
+    return render(request, 'aplicatiedjango/profile.html', {'user_data': user_data})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(user=request.user, data=request.POST) 
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, request.user) 
+            messages.success(request, 'Parola a fost actualizata') 
+            return redirect('profile')
+        else:
+            messages.error(request, 'Exista erori.')
+    else:
+        form = CustomPasswordChangeForm(user=request.user)
+    return render(request, 'aplicatiedjango/change_password.html', {'form': form})
+
+
+profile.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profilul Meu</title>
+</head>
+<body>
+    <h1>Profilul Meu</h1>
+    <ul>
+        <li>Nume utilizator: {{ user_data.username }}</li>
+        <li>Prenume: {{ user_data.first_name }}</li>
+        <li>Nume: {{ user_data.last_name }}</li>
+        <li>Email: {{ user_data.email }}</li>
+        <li>Telefon: {{ user_data.telefon }}</li>
+        <li>Adresa: {{ user_data.adresa }}</li>
+        <li>Țara: {{ user_data.tara }}</li>
+        <li>Oraș: {{ user_data.oras }}</li>
+        <li>Cod Poștal: {{ user_data.codpostal1 }}</li>
+    </ul>
+    <a href="{% url 'change_password' %}">Schimbă Parola</a>
+    <a href="{% url 'custom_logout_view' %}">Deconectare</a>
+</body>
+</html>
+
+
+change_password.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schimbă Parola</title>
+</head>
+<body>
+    <h1>Schimbă Parola</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="error">
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit">Schimbă Parola</button>
+    </form>
+</body>
+</html>
