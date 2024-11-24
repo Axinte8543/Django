@@ -1,0 +1,8 @@
+1.
+Sa se creeze un model personalizat pentru utilizatori care va avea minim 5 campuri suplimentare fata de cele predefinite.
+class CustomUser(AbstractUser):
+    telefon = models.CharField(max_length=10, blank=True)
+    adresa = models.CharField(max_length=50, blank=True)
+    tara = models.CharField(max_length=20, blank=True)
+    oras = models.CharField(max_length=20, blank=True)
+    codpostal1 = models.CharField(max_length=6, blank=True)
