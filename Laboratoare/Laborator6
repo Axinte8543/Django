@@ -71,6 +71,7 @@ def custom_login_view(request): --pe asta il folosim si pentru formularul de aut
     return render(request, 'login.html', {'form': form})
 
 Logarea
+Django foloseste middleware-ul SessionMiddleware pentru a pastra starea autentificarii utilizatorului
 from django.contib.auth import login
 if user is not None:
   login(request, user)
@@ -82,7 +83,8 @@ def logout_view(request):
     return redirect('home')
 
 
-View folosind UserCreationForm Inregistrari
+View folosind UserCreationForm 
+Ca sa inregistram un user nou
 
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
@@ -117,6 +119,8 @@ class CustomUserCreationForm(UserCreationForm):
 In views.py este aceeasi chestie
 
 Validarile sunt la fel ca la formulare
+
+
 Schimbarea parolei (PasswordChangeForm):
 
 Views.py:
@@ -139,6 +143,17 @@ def change_password_view(request):
         form = PasswordChangeForm(user=request.user)
     return render(request, 'schimba_parola.html', {'form': form})
 
+Personalizarea clasei PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django import forms
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def clean_new_password1(self):
+        password1 = self.cleaned_data.get('new_password1')
+        if len(password1) < 10:
+            raise forms.ValidationError("Parola trebuie sa aiba macar 10 caractere.")
+        return password1
+
 
 Cum creezi un utilizator nou:
 user= User.objects.create_user(username='Irina', email='irina@gmail.com', password='irina')
@@ -160,3 +175,47 @@ class CustomUser(AbstractUser):
 
 In setting.py vom avea 
 AUTH_USER_MODEL = 'aplicatie_exemplu.CustomUser'
+
+
+Session Middleware
+Gestioneaza sesiunile utilizatorilor.Este esential pentru autentificare, cos de cumparaturi sau preferintele utilizatorilor etc.
+
+Cum functionaza:
+Procesarea unei cereri:
+Middleware-ul cauta cookieul trimis de client si daca cookieul este valid, middlewareul incarca datele sesiunii
+Procesarea unui raspuns:
+Daca datele din request.session au fost modificate, middlewareul salveaza sesiune in backhandul configurat si un cookie de sesiune actualizat este trimis in raspuns
+
+Obiectul request.session
+-este o instanta a clasei SessionBase si permite stocarea datelor sub forma de perechi cheie-valoare
+Stocarea datelor:
+def setare_sesiune(request):
+    request.session['user_id'] = 42
+    request.session['nume'] = 'ionel'
+    return HttpResponse("Date setate.")
+Accesarea datelor:
+def obtine_date(request):
+    user_id = request.session.get('user_id', '0')
+    nume = request.session.get('nume', 'anonim')
+    return HttpResponse(f"User ID: {user_id}, Nume: {nume}")
+Stergerea unei chei:
+def sterge_cheie(request):
+    try:
+        del request.session['user_id']
+    except KeyError:
+        pass
+    return HttpResponse("Cheia user_id a fost stearsa din sesiune.")
+Stergerea tutoror datelor din sesiune
+def sterge_sesiune(request):
+    request.session.clear()
+    return HttpResponse("Toate datele din sesiune au fost sterse")
+
+Putem configura durata implicita a sesiunii adaugand in setting.py:
+SESSION_COOKIE_AGE = 3600  # o ora
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True --sesiunea expira cand utilizatorul inchide browserul
+SESSION_COOKIE_SECURE = True --fortam utilizarea cookieurilor doar pe conexiuni https
+SESSION_COOKIE_HTTPONLY = True --blocheaza accesul la cookieuri din JavaScript
+SESSION_COOKIE_SAMESITE = 'Lax' --alta masura de securitate
+
+
+
