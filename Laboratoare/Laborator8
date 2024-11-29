@@ -1,0 +1,211 @@
+Perminisunile pentru utilizatori in Django:
+Django include un sistem de permisiuni predefinit pentru a gestiona accesul utilizatorilor la diverse acțiuni sau resurse dintr-o aplicație. 
+Permisiunile se găsesc în tabelul auth_permission.
+
+Cum fucționează permisiunile în Django
+Sunt bazate pe modele
+Fiecare model din Django are, în mod implicit, următoarele permisiuni predefinite:
+add_<nume_model>: Permisiunea de a adăuga obiecte pentru model.
+change_<nume_model>: Permisiunea de a modifica obiecte existente.
+delete_<nume_model>: Permisiunea de a șterge obiecte.
+view_<nume_model>: Permisiunea de a vizualiza obiecte.
+Exemplu: Pentru un model Produs dintr-o aplicație numită aplicatie_exemplu, permisiunile generate automat sunt: 
+aplicatie_exemplu.add_produs, aplicatie_exemplu.change_produs, aplicatie_exemplu.delete_produs, aplicatie_exemplu.view_produs
+
+Permisiunile pot fi atribuite individual fiecărui utilizator sau pot fi gestionate prin grupuri. 
+Un utilizator are permisiunile directe și permisiunile moștenite din grupurile din care face parte.
+
+class Carte(models.Model):
+    titlu = models.CharField(max_length=100)
+    autor = models.CharField(max_length=100)
+
+    class Meta:
+        default_permissions = ('add', 'view') --Django generează, în mod implicit, permisiunile add, change, delete și view pentru fiecare model, asa o le avem pe cele 2
+
+Permisiuni personalizate:
+class Produs(models.Model):
+    nume = models.CharField(max_length=200)
+    descriere = models.TextField()
+    class Meta:
+        permissions = [
+            ("ascunde_produs", "Ascunde un produs din lista vizibila pentru clienti."),            
+            ("afiseaza_produs", "Afiseaza un produs in lista, pentru clienti."),
+
+După definirea permisiunilor, trebuie să rulați:
+python manage.py makemigrations
+python manage.py migrate
+
+Permisiunile utilizatorilor
+Atributul user_permissions al modelului User reprezintă relația Many-to-Many între un utilizator și permisiunile sale personalizate.
+Este o modalitate prin care un utilizator poate primi permisiuni individuale, fără a fi nevoie să aparțină unui grup.
+Relația Many-to-Many dintre User și Permission este stocată într-un tabel intermediar numit auth_user_user_permissions
+
+Utilizarea user_permissions:
+Atribuirea unei permisiuni unui utilizator: utilizator.user_permissions.add()
+Eliminarea unei permisiuni: utilizator.user_permissions.remove()
+Obținerea tuturor permisiunilor unui utilizator: utilizator.user_permissions.all()
+Ștergerea tuturor permisiunilor: utilizator.user_permissions.clear()
+
+Atribuirea permisiunilor:
+
+from django.contrib.auth.models import User, Permission
+utiliz = User.objects.get(username='gigel') --se cauta un utilizator cu usernameul gigel
+permisiune = Permission.objects.get(codename='afiseaza_produs') --cauta o permisiune cu numele 'afiseaza_produs'
+utiliz.user_permissions.add(permisiune) --permisiunea este adaugata direct utilizatorului
+
+Verificarea permisiunilor:
+Permisiunile utilizatorilor pot fi verificate folosind metoda has_perm.
+Metoda has_perm verifică atât permisiunile directe ale utilizatorului cât și cele moștenite din grupuri.
+
+from django.contrib.auth.models import User, Permission
+utiliz = User.objects.get(username='gigel')
+if utiliz.has_perm('aplicatie_exemplu.afiseaza_produs'): --verifica daca utilizatorul are permisiunea 
+    print("Utilizatorul poate face un produs vizibil pentru clienti.")
+
+Stergerea unei permisiuni
+Pentru a șterge o permisiune, întâi e necesară identificarea permisiunii pe care dorim să o ștergem 
+(de exemplu prin metodele get() sau filter()) și utilizarea metodei delete() pentru a o elimina din baza de date.
+
+from django.contrib.auth.models import Permission
+from django.core.exceptions import ObjectDoesNotExist
+try:
+    permission = Permission.objects.get(codename='poate_afisa') --cauta o instructiune poate_afisa
+    permission.delete() --sterge permisiunea din baza de date daca aceasta exista
+    print("Permisiunea a fost stearsa")
+except ObjectDoesNotExist:
+    print("Permisiunea nu a fost gasita")
+
+#pentru o permisiune asociata unui model:
+from .models import Carte
+from django.contrib.contenttypes.models import ContentType
+Permission.objects.filter(codename='doneaza_biblioteca', --filtreaza permisiunile cu codename='doneaza_biblioteca'
+    content_type=ContentType.objects.get_for_model(Carte), --gasesete obiectul Contentype asociat modelului carte
+).delete() --sterge toate permisiunile care corespund filtrului
+
+
+Interactiunea cu interfata admin
+
+@admin.register(Produs) --Înregistrează clasa ProdusAdmin ca administrator pentru modelul Produs
+class ProdusAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request): --Verifică dacă utilizatorul conectat are permisiunea add_produs pentru aplicația aplicatie_exemplu.
+        return request.user.has_perm('aplicatie_exemplu.add_produs') --Dacă are permisiunea, returnează True și îi permite să adauge obiecte de tip Produs.
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.has_perm('aplicatie_exemplu.change_produs')
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.has_perm('aplicatie_exemplu.delete_produs')
+
+Decoratori pentru permisiuni:
+
+@permission_required(perm, login_url=None, raise_exception=False)
+perm: Permisiunea care trebuie verificată (sub formă de string).
+login_url: URL-ul unde utilizatorul este redirecționat dacă nu este autentificat. Implicit: valoarea setării LOGIN_URL (din settings.py).
+raise_exception: Dacă este setat la True, în loc să redirecționeze utilizatorul, se ridică o excepție PermissionDenied dacă utilizatorul nu are permisiunea necesară.
+
+from django.contrib.auth.decorators import permission_required
+@permission_required('aplicatie_exemplu.add_produs', raise_exception=True)
+def adauga_produse(request):
+
+
+Grupuri de utilizatori:
+Grupurile sunt un mecanism din cadrul sistemului de autentificare care permite organizarea și gestionarea utilizatorilor prin alocarea de roluri și permisiuni comune.
+Avantajul grupurilor:-administrare mai simplă a permisiilor: 
+În loc să se atribuie permisiuni individuale fiecărui utilizator, se poate crea un grup cu anumite permisiuni și să se adauge utilizatori în acel grup.
+Toți utilizatorii grupului vor moșteni aceleași permisiuni.
+                      -grupurile sunt utile pentru definirea rolurilor, cum ar fi: administratori, moderatori, vizitatori etc.
+                      -gestionarea permisiilor devine mai ușoară pe măsură ce aplicația crește și are mai mulți utilizatori.
+
+Grupurile sunt reprezentate de modelul Group, care are două câmpuri principale:
+name: Numele grupului.
+permissions: Permisiunile atribuite grupului, un set de obiecte Permission.
+
+Relația dintre utilizatori și grupuri:
+Un utilizator poate aparține mai multor grupuri.
+Permisiunile unui utilizator sunt reprezintă reuniunea  dintre mulțimea permisiunilor directe și mulțimea celor moștenite din grupuri.
+Exemple:
+Grupul "Angajati" poate avea permisiuni de adăugare și editare produse.
+Grupul "Clienti" poate avea doar permisiuni de vizualizare.
+
+Crearea unui grup si atribuirea permisiunilor:
+Crearea grupurilor se poate face prin interfața de administrare. Tot acolo se pot aloca și permisiuni.
+
+angajati = Group.objects.create(name='Angajati') --creeaza un obiect de tip Group cu numele Angajati
+drept_editare = Permission.objects.get(codename='change_produs')
+drept_stergere = Permission.objects.get(codename='delete_produs')
+angajati.permissions.add(drept_editare, drept_stergere) --adauga permisiunile pentru angajati
+
+Adaugarea unui utilizator la un grup:
+
+grup_angajati = Group.objects.create(name='Angajati')
+permisiune_editare_produse = Permission.objects.get(codename='change_produs')
+grup_angajati.permissions.add(permisiune_editare_produse)
+utiliz = User.objects.get(username='gigel')
+utiliz.groups.add(grup_angajati)
+if utiliz.has_perm('aplicatie_exemplu.change_produs'):
+    print("Utilizatorul poate modifica produse, fiind angajat.")
+
+
+Obținerea grupurilor din care face parte un utilizator
+
+from django.contrib.auth.models import User, Group
+utiliz = User.objects.get(username='costel')
+grup1 = Group.objects.get(name='Angajati')
+grup2 = Group.objects.get(name='Lenesi')
+grup3 = Group.objects.get(name='DarDestepti')
+utiliz.groups.add(grup1,grup2,grup3)
+print(utiliz.groups.all())
+
+
+Verificarea apartenentei la un grup
+utiliz = User.objects.get(username='costel')
+
+if utiliz.groups.filter(name='Angajati').exists(): --verifica daca utilizatorul costel este angajat
+    print("Utilizatorul e angajat.")
+else:
+    print("Utilizatorul nu e angajat.")
+   
+grupuri_sefi = utiliz.groups.filter(name__startswith="Sefi") --filtreaza grupurile care incep cu Sefi
+#Afisam toate grupurile de sefi
+for group in grupuri_sefi:
+    print(group.name) --afiseaza numele fiecarui grup gasit
+
+if utiliz.groups.filter(id=3).exists(): --ne spune daca utilizatorul costel este asociat cu un grup care are id 3
+    print("Utilizatorul este in grupul cu id-ul 3.")
+
+
+Stergerea utilizatorilor dintr-un grup
+
+from django.contrib.auth.models import Group, User
+utilizator = User.objects.get(username='costel')
+
+angajati = Group.objects.get(name="Angajati")
+moderatori = Group.objects.get(name="Moderatori")
+bonus = Group.objects.get(name="Bonus")
+
+#pot elimina dintr-un singur grup
+utilizator.groups.remove(bonus)
+#sau din mai multe
+utilizator.groups.remove(angajati, moderatori)
+
+HttpsResponseForbidden
+Clasa HttpResponseForbidden este folosită pentru a returna un răspuns HTTP cu codul de status 403 Forbidden.
+HttpResponseForbidden va trimite codul de status HTTP 403: acest cod de status este utilizat pentru a semnala că accesul la resursa cerută este interzis.
+Folosim acest răspuns când:
+-utilizatorul nu are acces la o resursă sau o funcționalitate specifică.
+-accesul este blocat din motive de configurare sau politică a companiei
+-dorim să restricționăm accesul la părți sensibile ale aplicației
+
+from django.http import HttpResponseForbidden, HttpResponse
+from django.shortcuts import render
+
+def afisare_pagina(request):
+    if not request.user.has_perm('aplicatie_exemplu.vizualizare_pagina'): --daca utilizatorul nu are permisiunea vizualizare_pagina
+        return HttpResponseForbidden("Nu ai voie aici! Pa!")
+    return HttpResponse("Ok, bine, tu ai voie.")
+
+def afisare_pagina2(request):
+    if not request.user.has_perm('aplicatie_exemplu.vizualizare_pagina'):
+        return HttpResponseForbidden(render(request, '403.html')) --daca utilizatorul nu are permisiunea foloseste un html 403.html
+    return HttpResponse("Ok, bine, tu ai voie.")
+
