@@ -209,3 +209,15 @@ def afisare_pagina2(request):
         return HttpResponseForbidden(render(request, '403.html')) --daca utilizatorul nu are permisiunea foloseste un html 403.html
     return HttpResponse("Ok, bine, tu ai voie.")
 
+
+CustomUserAdmin
+
+class CustomUserAdmin(UserAdmin):
+    model = CustomUser
+    search_fields = ('username', 'email')
+    fieldsets = (
+        ('Contact Info', {'fields': ('telefon',)}),
+        ('Address Details', {'fields': ('adresa', 'tara', 'oras', 'codpostal1')}),
+    ) + UserAdmin.fieldsets
+
+admin.site.register(CustomUser, CustomUserAdmin)
