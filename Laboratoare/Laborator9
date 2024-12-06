@@ -1,0 +1,206 @@
+Programarea taskurilor automate
+Adesea pe serverele web este necesară rularea periodică a unor comenzi.
+-creare de backup-uri
+-trimitirea unor notificări, alerte (de exemplu care să amintească angajaților să facă un anumit task)
+-trimiterea unor e-mail-uri (de exemplu cu mesaje promotionale)
+-ștergerea fișierelor vechi (cum ar fi fișierele de log sau diverse fișiere temporare)
+-ștergerea utilizatorilor inactivi (de exemplu conturi cu e-mail neconfirmat care sunt mai vechi de un anumit număr de zile)
+-etc.
+
+Ca sa programam aceste comenzi o sa folosim modulul schedule
+Instalare prin pip install schedule
+Modulul schedule permite programarea taskurilor recurente la intervale specifice
+Cream in proiectul nostru un fisier numit de exemplu schedule.py
+
+Ex:
+import schedule
+import time
+
+def f():
+    print("Se va afisa la fiecare minut")
+
+schedule.every(1).minute.do(f) --executam functia f la fiecare minut
+
+while True:
+    schedule.run_pending() -verifică dacă există sarcini (funcții) care trebuie rulate conform programării. Dacă există, le execută.
+    time.sleep(1) -face ca bucla să se oprească pentru o secundă înainte de a verifica din nou.Acest lucru reduce consumul de resurse ale procesorului
+
+schedule.every(10).seconds.do(task)-La fiecare 10 secunde
+schedule.every(2).minutes.do(task)-La fiecare 2 minute
+schedule.every().hour.do(task) -In fiecare ora
+schedule.every().day.at("10:30").do(task) -Zilnic la ora 10:30
+schedule.every().monday.do(task) -In fiecare luni
+schedule.every().wednesday.at("13:15").do(task) -Miercurea la 13:15
+
+
+Putem sa combinam mai multe taskuri in acelasi program:
+
+def task1():
+    print("task 1 executat.")
+def task2():
+    print("task 2 executat.")
+schedule.every(10).minute.do(task1)
+schedule.every().hour.do(task2)
+while True:
+    schedule.run_pending()
+    time.sleep(1)
+
+schedule.cancel_job(task) --pentru a sterge taskul respectiv
+schedule.clear() --pentru a sterge toate taskurile
+print(schedule.jobs) --pentru a printa toate taskurile programate
+
+Setarea taskurilor aplicatiei:
+Cream fisierul tasks.py
+import schedule
+import time
+import django
+import os
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proiect1.settings') 
+django.setup() --Încarcă setările proiectului Django (proiect1.settings) și inițializează cadrul Django.
+
+from django.utils import timezone
+from .models import Carte
+
+def task1():
+    print(f"Task executat la {timezone.now()}") --afiseaza un mesaj cu data si ora curenta
+    Carte.objects.update(ultima_actulizare=timezone.now()) --actualizeaza campul ultima_actualizare al tuturor instantelor modelului Carte la data si ora curenta
+
+def task2():
+    print(f"Alt task")
+
+
+Programarea taskurilor aplicatiei:
+Cream un fisier ruleaza_taskuri.py in radacina proiectului Django unde se afla manage.py
+
+import schedule
+import time
+import django
+import os
+import sys
+from aplicatie_exemplu import tasks
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proiect1.settings')
+django.setup()
+
+def run_scheduler():
+    schedule.every(10).seconds.do(tasks.task1)
+    schedule.every().day.at("00:00").do(tasks.task2)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+if __name__ == "__main__":
+    try:
+        run_scheduler()
+    except KeyboardInterrupt:
+        print("Scheduler oprit manual.")
+        sys.exit()
+
+
+Sitemap
+Un sitemap este un fișier (de obicei în format XML) care enumeră paginile unui site web, împreună cu informații despre structura și actualizările lor. 
+Este utilizat în principal de motoarele de căutare (precum Google și Bing) pentru a înțelege mai bine conținutul și arhitectura unui site.
+Pentru a lucra cu sitemaps în Django, trebuie inclus django.contrib.sitemaps în INSTALLED_APPS din settings.py.
+
+La ce folosește un Sitemap:
+-Indexare mai eficientă: Ajută motoarele de căutare să descopere și să indexeze paginile site-ului, inclusiv cele care pot fi dificil de găsit prin crawling normal.
+-Optimizare SEO: Furnizează detalii precum ultima dată de modificare a unei pagini, frecvența de actualizare și prioritatea relativă a paginilor.
+-Management al site-urilor mari: Este util pentru site-urile cu multe pagini sau structuri complexe.
+
+
+Cream un fisier sitemaps.py
+from django.contrib.sitemaps import Sitemap
+from django.urls import reverse
+from .models import Carte
+
+class CarteSitemap(Sitemap):
+    changefreq = "monthly"  --Sugerează motoarelor de căutare cât de des se schimbă conținutul.
+    priority = 0.8   --Prioritatea (1.0 = cea mai mare)      
+
+    def items(self):
+        return Carte.objects.all() --Returneaza obiectele care vor fi incluse in sitemap
+
+    def lastmod(self, obj):
+        return obj.actualizat_la --Returneaza data ultimei modificari pentru fiecare obiect
+
+Adaugarea unei pagine statice(fara modele) in sitemap
+
+Este util pentru a include în sitemap paginile generate de view-uri statice, cum ar fi pagina principală (index) sau pagina de contact.
+
+class VederiStaticeSitemap(Sitemap):
+    changefreq = "monthly"
+    priority = 0.5
+
+    def items(self):
+        return ['index', 'contact']--Returnează o listă de identificatori pentru view-urile statice. Acestea sunt numele specificate în parametrii name din urls.py
+
+    def location(self, item):
+        return reverse(item) --Primește fiecare item din lista items și generează URL-ul corespunzător folosind funcția reverse
+
+
+Adaugarea sitemap in urls.py
+from django.contrib.sitemaps.views import sitemap --O vizualizare generică Django pentru generarea automată a fișierului sitemap.xml
+from .sitemaps import CarteSitemap, VederiStaticeSitemap
+
+sitemaps = {
+    'carte': CarteSitemap, --Cheie care identifică paginile generate de CarteSitemap
+    'static': VederiStaticeSitemap,
+}
+
+urlpatterns = [
+    #... restul de path-uri
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    --Expune sitemap-ul la ruta http://<domeniul_tău>/sitemap.xml
+    --Motoarele de căutare, cum ar fi Google, pot accesa acest URL pentru a înțelege structura site-ului.
+]
+
+
+Framework-ul de mesaje
+-oferă o modalitate simplă de a transmite mesaje temporare utilizatorilor, cum ar fi notificări de succes, erori sau informații.
+-În INSTALLED_APPS  trebuie inclus django.contrib.messages 
+-În MIDDLEWARE să fie incluse: django.contrib.sessions.middleware.SessionMiddleware,django.contrib.messages.middleware.MessageMiddleware
+
+Trebuie configurat si backend-ul pentru mesaje in settings.py
+from django.contrib.messages import constants as message_constants
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+#Personalizarea nivelurilor de mesaje:
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'debug', --pentru mesaje de depanare
+    message_constants.INFO: 'info', --pentru mesaje informative
+    message_constants.SUCCESS: 'success', --notifica succesul unei actiuni
+    message_constants.WARNING: 'warning', --avertisment
+    message_constants.ERROR: 'error', --eroare
+}
+
+Adauagare mesajelor intr-un view:
+from django.contrib import messages
+def afisare(request):
+    messages.debug(request, "Acesta este un mesaj de depanare. :( ")
+    messages.info(request, "Acesta este un mesaj informativ. :) ")
+    messages.success(request, "Actiunea a avut succes! :D ")
+    messages.warning(request, "Acesta este un avertisment. :| ")
+    messages.error(request, "A aparut o eroare! >:((  ")
+   
+    return render(request, 'un_template.html')
+
+Afisarea mesajelor intr-un template
+{% if messages %} 
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+--message.tags: conține un șir asociat nivelului mesajului (exemplu: success, error).
+--message: Textul efectiv al mesajului.
+
+
+Redirectare cu mesaje: --views.py
+from django.contrib import messages
+from django.shortcuts import redirect
+
+def redirectionare(request): 
+    messages.success(request, "Ai fost redirectionat!")
+    return redirect('home')
