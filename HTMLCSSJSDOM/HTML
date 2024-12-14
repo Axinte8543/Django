@@ -124,10 +124,10 @@ method="POST": Trimite datele folosind metoda POST
 <input id="inusa" type="radio" name="loc" value="">
 
 <label for="outusa>Outside: </label>
-<input id="outusa" type="radio" name="loc" value="">
+<input id="outusa" type="radio" name="loc" value=""> --va face un camp pe aceeasi linie cu doua campuri Inside si Outside in care trebuie sa bifam
 
 <h2>How was your service?</h2>
-<select name="stars"?
+<select name="stars"? --partea cu select ne va da un camp in care vom vota 3,2 sau 1
      <option value="Great">3</option>
      <option value="Okay">2</option>
      <option value="Bad">1</option>
@@ -136,16 +136,11 @@ method="POST": Trimite datele folosind metoda POST
 
 <h2>Any other feedback></h2>
 
-<textarea name="mytext" rows="8" cols="80"></textarea>
+<textarea name="mytext" rows="8" cols="80"></textarea> --Permite introducerea de text lung, cu o dimensiune de 8 rânduri și 80 de coloane.
 
 <input type="submit" name="" value="SUBMIT">
 </form>
 
-<label for="inusa>Inside: </label>
-<input id="inusa" type="radio" name="loc" value="">
---va face un camp pe aceeasi linie cu doua campuri Inside si Outside in care trebuie sa bifam
-<select> #partea cu select ne va da un camp in care vom vota 3,2 sau 1
-<textarea>: Permite introducerea de text lung, cu o dimensiune de 8 rânduri și 80 de coloane.
 
 <link rel="stylesheet" href="./styles/header.css"> #ca sa folosim css din styles/header.css
 --in HTML exista cai relative si cai absolute iar acesta este un exemplu de cale relativa
