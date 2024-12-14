@@ -10,7 +10,8 @@ view1.style.display = "flex"; //va face view1 flex
 
 const views= document.getElementsByClassName("view"); //selecteaza toate elementele care au clasa view si returneaza un htmlcollection
 const sameViews = document.querySelectorAll(".view"); //selecteaza toate clasele care au clasa view si returneaza un nodelist(o colectie statica de elemente)
-//diferentele intre cele doua sunt ce returneaza, ca primul se actualizeaza daca un element din clasa view este adaugat sau eliminat din DOM, iar nodelist nu va actualiza automat si Nodelist poate sa selecteze si pe altceva in afara clasei ca de exemplu:p,atribute,div,etc
+//diferentele intre cele doua sunt ce returneaza, ca primul se actualizeaza daca un element din clasa view este adaugat sau eliminat din DOM, 
+iar nodelist nu va actualiza automat si Nodelist poate sa selecteze si pe altceva in afara clasei ca de exemplu:p,atribute,div,etc
 
 const sameDivs=view1.getElementsByTagName("div"); //va lua in functie de tagname
 console.log(sameDivs);
