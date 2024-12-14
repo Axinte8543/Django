@@ -91,3 +91,8 @@ def pag8(request):
     tabel_html += "</table>"
     return HttpResponse(tabel_html)
 
+c=request.GET.get("a",0) #cauta parametrul a in cererea get si daca il gasesc o sa ii dea lui c valoarea pe care o are, daca nu o gasesc o sa ii dea 0
+num_params = len(request.GET) #numarul de parametri primiti
+
+l1=[]
+global l1
