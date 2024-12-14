@@ -1,0 +1,128 @@
+Coș virtual
+Un coș virtual este un spațiu unde clienții își adună produsele pe care doresc să le cumpere, înainte de a finaliza comanda. 
+Funcționează similar unui coș de cumpărături dintr-un magazin fizic, doar că în format digital.
+
+Functionalitati:
+Adăugare produse
+Modificare cantități
+Eliminare produse
+Calculul automat al prețurilor
+Aplicarea de cupoane
+Integrare cu alte sisteme: Coșul virtual trebuie să fie integrat cu alte sisteme ale magazinului online, precum catalogul de produse, sistemul de inventar.
+
+LocalStorage
+Diferenta dintre sessionStorage si localStorage este ca daca salvam in sessionStorage o sa dispara cand terminam sesiunea, iar in localStorage o sa ramana mereu
+Limita localStorage-ului este în general de aproximativ 5-10 MB pe domeniu, în funcție de browser.
+Este organizat sub formă de chei unice cu valori asociate.
+Atât cheile cât și valorile sunt stringuri
+
+setItem(key, value) - Salvează o valoare asociată cu o cheie specifică în localStorage. Dacă cheia există deja, valoarea este suprascrisă.
+Argumente:
+key (string): Numele cheii.
+value (string): Valoarea asociată cheii. Variabila value trebuie să fie de tip string; dacă nu este, va fi convertită implicit.
+localStorage.setItem('cos_virtual', '1,4,5');
+
+
+getItem(key) - Returnează valoarea asociată cu o cheie specifică. Argumentul key este de tip string și reprezintă numele cheii. 
+Returnează valoarea asociată cheii sau null dacă nu există cheia.
+let id_uri = localStorage.getItem('cos_virtual');
+
+
+key(index) - returnează numele (cheia) unei intrări pe baza indexului său. Argumentul index este un număr întreg și reprezintă poziția intrării în localStorage. 
+Indexul începe de la 0 și este bazat pe ordinea în care au fost adăugate datele.Returnează null dacă indexul nu este valid.
+
+localStorage.setItem('cheie1', 'valoare1');
+localStorage.setItem('cheie2', 'valoare2');
+console.log(localStorage.key(0)); // 'cheie1'
+console.log(localStorage.key(1)); // 'cheie2'
+
+
+removeItem(key) - elimină o pereche cheie-valoare din localStorage pe baza cheii. 
+Argumentul key este de tip string și reprezintă numele cheii care trebuie eliminată.
+localStorage.removeItem('cos_virtual');
+
+
+clear() - șterge toate datele din localStorage pentru domeniul curent.
+localStorage.clear();
+
+
+Dacă trebuie să stocați obiecte sau alte tipuri de date, utilizați metode precum JSON.stringify() și JSON.parse()
+let obiect = { nume: 'Irina', varsta: 38 };
+localStorage.setItem('utilizator', JSON.stringify(obiect));
+
+let utilizator = JSON.parse(localStorage.getItem('utilizator'));
+console.log(utilizator.nume);
+
+localStorage este accesibil de pe orice script care rulează în aceeași origine (domeniu), deci evitați stocarea informațiilor sensibile, cum ar fi parolele sau token-urile de autentificare.
+
+localStorage sincronizează automat modificările între paginile ale aceluiași domeniu. 
+Dacă o valoare este actualizată într-o pagină, alte pagini deschise pot primi evenimentul storage pentru a detecta modificarea.
+
+
+Exemplu HTML:
+<!DOCTYPE html>
+<html lang="ro">
+    <head>
+        <title>Prajituri</title>
+        <style>
+            article{
+                border:1px solid grey;
+            }
+        </style>
+        <script>
+            window.onload=function(){
+
+                let id_uri_cos=localStorage.getItem("cos_virtual") --se verifica daca exista un cos virtual stocat in localStorage
+                if (id_uri_cos){ 
+                    //cand are ceva in cosul cos_virtual
+                    // o lista de id-uri, de exemplu "2,7,1,14"
+                    //daca vrem si cantitate "2/10,7/3,1/3,14/1" id/cantitate
+                    //varianta 2 vector de iduri si de cantitati
+                    let vector_cos=id_uri_cos.split(","); --se creeaza un vector cu ID-urile produselor
+                    let articole=document.getElementsByClassName("produs") --se selecteaza toate articolele cu clasa produs
+                    for(let articol of articole){ --se verifica daca ID-ul fiecaruia este inclus in vectroul vector_cos
+                        if (vector_cos.includes(articol.dataset["id"])){ --bordura va deveni rosie daca este inclusa
+                            articol.style.borderColor="red";
+                        }
+                    }
+                }
+
+
+                var butoane=document.getElementsByClassName("btn_cos_virtual");
+                for(let btn of butoane){
+                    btn.onclick=function(){ --pentru fiecare buton cu clasa btn_cos_virtual
+                        let id_uri_cos=localStorage.getItem("cos_virtual")
+                        if (id_uri_cos){
+                            //cand are ceva in cosul cos_virtual
+                            // o lista de id-uri, de exemplu "2,7,1,14"
+                            //daca vrem si cantitate "2/10,7/3,1/3,14/1" id/cantitate
+                            //varianta 2 vector de iduri si de cantitati
+                            let vector_cos=id_uri_cos.split(","); 
+                            if (!vector_cos.includes(this.dataset["id"])){
+                                vector_cos.push(this.dataset["id"]) --se adauga id-ul produsului in vectorul vector_cos
+                                localStorage.setItem("cos_virtual",vector_cos) --este salvat in localStorage
+                            }
+
+                        }
+                        else{
+                            localStorage.setItem("cos_virtual",this.dataset["id"]) --se creeaza un cos nou care contine doar ID-ul produsului curent
+                        }
+                    }
+                }
+            }
+        </script>
+    </head>
+    <body>
+	
+    {% for prajitura in prajituri %}
+    <article data-id="{{ prajitura.id }}" class="produs"> --container pentru fiecare prajitura, data-id permite identificarea produsului in JavaScript
+    	<p>{{ prajitura.nume }}</p>
+    	<p>{{ prajitura.pret }}</p>
+        <button data-id="{{ prajitura.id }}" data-nume={{ prajitura.nume }} class="btn_cos_virtual">Adauga in cos</button>
+    </article>
+    {% endfor %}
+
+    </body>
+</html>
+
+
