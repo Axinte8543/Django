@@ -17,11 +17,11 @@ HTML
 <p><strong>This is a text that is in bold</strong></p> 
 <p><em>This is a text that is in italics</em></p> 
 
-<h1> până la <h6> Sunt folosite pentru a crea titluri sau antete de diferite nivele.
-<h1> este cel mai mare si cel mai important folosit de obiecei ca titlul paginii
-<h2> mai mic si este folosit de obiecei ca subtitluri
-Restul sunt din ce in ce mai mici
-<p> reprezinta un paragraf de text, cu strong bolduim textul, iar cu em scriem italic
+--<h1> până la <h6> Sunt folosite pentru a crea titluri sau antete de diferite nivele.
+--<h1> este cel mai mare si cel mai important folosit de obiecei ca titlul paginii
+--<h2> mai mic si este folosit de obiecei ca subtitluri
+--Restul sunt din ce in ce mai mici
+--<p> reprezinta un paragraf de text, cu strong bolduim textul, iar cu em scriem italic
 
 3.<ol>
        <li>First Item</li>
@@ -47,8 +47,8 @@ Restul sunt din ce in ce mai mici
       </ul>
    </ol>      
 
-<ol> creeaza o lista ordonata unde fiecare element este numerotat
-<ul> creeaza o lista neordonata unde fiecare element are un marcaj(in loc sa fie numerotat)
+--<ol> creeaza o lista ordonata unde fiecare element este numerotat
+--<ul> creeaza o lista neordonata unde fiecare element are un marcaj(in loc sa fie numerotat)
 
 4.
 <div class="groupone">
@@ -56,16 +56,14 @@ Restul sunt din ce in ce mai mici
      <p>I want to <span>be together in</span> group one<p>
 </div>
 
-<div> este un element de tip container folosit pentru a grupa alte elemente împreună.
-Atributul class="groupone" atribuie div-ului o clasă numită "groupone". Aceasta permite stilizarea div-ului folosind CSS.
+--<div> este un element de tip container folosit pentru a grupa alte elemente împreună.
+--Atributul class="groupone" atribuie div-ului o clasă numită "groupone". Aceasta permite stilizarea div-ului folosind CSS.
 
 5.
-<img src="image.jpg" alt="Imaginea unui peisaj montan">
-<a href="https://www.example.com">Acesta este un link către Example</a>
+<img src="image.jpg" alt="Imaginea unui peisaj montan"> --src: Specifică calea (URL-ul) imaginii.
+<a href="https://www.example.com">Acesta este un link către Example</a> --href: Este obligatoriu și definește calea (URL-ul) către care duce link-ul.
 
-src: Specifică calea (URL-ul) imaginii.
 alt: Text alternativ care apare în locul imaginii în cazul în care aceasta nu se poate încărca.
-href: Este obligatoriu și definește calea (URL-ul) către care duce link-ul.
 
 6.
 <table border="1">
@@ -90,39 +88,33 @@ href: Este obligatoriu și definește calea (URL-ul) către care duce link-ul.
    </tbody>
 </table>
 
-<table> creeaza un tabel
-<thead> definim antetul tabelului care contine elemente de tip <th>
-<tr> reprezinta o linie a tabelului
-<tbody> randurile de date din tabel
-<td> reprezinta o celula de date
+--<table> creeaza un tabel
+--<thead> definim antetul tabelului care contine elemente de tip <th>
+--<tr> reprezinta o linie a tabelului
+--<tbody> randurile de date din tabel
+--<td> reprezinta o celula de date
 
 6.
 <form action="https://www.facebook.com/?locale=ro_RO" method="get">
    <h1>Log in</h1>
    <h2>Please Input your Email and Password</h2>
 
-   <input type="email" name="useremail" value="Email Here">
-   <input type="password" name="password" value="">
-   <input type="submit" name="" value="Click Me">
+   <input type="email" name="useremail" value="Email Here"> #un camp ca adaugi adresa de email, name defineste numele campului si value este valoare predefinita afisata in campul de email
+   <input type="password" name="password" value=""> #camp ca sa adaugi parola
+   <input type="text" name="username" placeholder="Enter your username"> #defineste tipul campului de intrare ca text
+   <input type="submit" name="" value="Click Me">  #camp ca sa dai submit la valorile din formular
 </form>
 
-<form> reprezunta un formular HTML, utilizat pentru a colecta date de la utilizator si a le trimie catre un server pentru procesare
+--<form> reprezunta un formular HTML, utilizat pentru a colecta date de la utilizator si a le trimie catre un server pentru procesare
 action="https://www.facebook.com/?locale=ro_RO": Definește URL-ul ca sa ne trimita la adresa respectiva cand dam submit
 method="POST": Trimite datele folosind metoda POST
-<input type="email" name="useremail" value="Email Here"> #un camp ca adaugi adresa de email, name defineste numele campului si value este valoare predefinita afisata in campul de email
-<input type="password" name="password" value="">: #camp ca sa adaugi parola
-<input type="submit" value="Click Me">: #camp ca sa dai submit la valorile din formular
-<input type="text" name="username" placeholder="Enter your username"> #defineste tipul campului de intrare ca text
 
 7.
 <form>
-<label for="userinput">Enter Input:</label>
-
-<input id="userinput" type="text" name="" placeholder="Hello" required>
-</form>
-
 <label for="userinput">Enter Input:</label> #comanda asta o sa scrie pe aceeasi linie enter input si id-ul userinput
+
 <input id="userinput" type="text" name="" placeholder="Hello" required> #required deoarece este obligatoriu sa fie ceva scris in camd ca sa dam submit, iar placeholder ca sa avem o valoare predefinita
+</form>
 
 8.
 <form method="get">
@@ -151,14 +143,14 @@ method="POST": Trimite datele folosind metoda POST
 
 <label for="inusa>Inside: </label>
 <input id="inusa" type="radio" name="loc" value="">
-#va face un camp pe aceeasi linie cu doua campuri Inside si Outside in care trebuie sa bifam
+--va face un camp pe aceeasi linie cu doua campuri Inside si Outside in care trebuie sa bifam
 <select> #partea cu select ne va da un camp in care vom vota 3,2 sau 1
 <textarea>: Permite introducerea de text lung, cu o dimensiune de 8 rânduri și 80 de coloane.
 
 <link rel="stylesheet" href="./styles/header.css"> #ca sa folosim css din styles/header.css
-#in HTML exista cai relative si cai absolute iar acesta este un exemplu de cale relativa
+--in HTML exista cai relative si cai absolute iar acesta este un exemplu de cale relativa
 
- #Căile absolute sunt specificate începând cu rădăcina sistemului de fișiere sau cu rădăcina site-ului web.Căile relative sunt specificate relativ la locația actuală a paginii sau fișierului HTML care le folosește. ./ il folosim cand css-ul se afla in aceleasi director cu htmlul
+--Căile absolute sunt specificate începând cu rădăcina sistemului de fișiere sau cu rădăcina site-ului web.Căile relative sunt specificate relativ la locația actuală a paginii sau fișierului HTML care le folosește. ./ il folosim cand css-ul se afla in aceleasi director cu htmlul
 
 Diferenta dintre id si class:
 1.Id-ul are prioritate mai mare ca clasa
