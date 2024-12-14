@@ -148,7 +148,8 @@ function handleFormSubmit(event) {
 }
 const myForm = view3.querySelector("#myForm");
 myForm.addEventListener("submit", handleFormSubmit, false);
-#Când utilizatorul trimite formularul, comportamentul implicit de trimitere va fi împiedicat (nu va reîncărca pagina) și mesajul "submit event" va fi afișat în consola browserului. Acest lucru îți permite să gestionezi datele din formular cu JavaScript, cum ar fi validarea datelor, trimiterea lor către un server prin AJAX sau orice altă logică specifică aplicației tale.
+#Când utilizatorul trimite formularul, comportamentul implicit de trimitere va fi împiedicat (nu va reîncărca pagina) și mesajul "submit event" va fi afișat în consola browserului. 
+#Acest lucru îți permite să gestionezi datele din formular cu JavaScript, cum ar fi validarea datelor, trimiterea lor către un server prin AJAX sau orice altă logică specifică aplicației tale.
 
 
 5.
