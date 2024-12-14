@@ -48,9 +48,9 @@ localStorage.clear();
 
 Dacă trebuie să stocați obiecte sau alte tipuri de date, utilizați metode precum JSON.stringify() și JSON.parse()
 let obiect = { nume: 'Irina', varsta: 38 };
-localStorage.setItem('utilizator', JSON.stringify(obiect));
+localStorage.setItem('utilizator', JSON.stringify(obiect)); --il creezi in format JSON si il salvezi ca utilizator
 
-let utilizator = JSON.parse(localStorage.getItem('utilizator'));
+let utilizator = JSON.parse(localStorage.getItem('utilizator')); --o convertesti inapoi intr-un obiect
 console.log(utilizator.nume);
 
 localStorage este accesibil de pe orice script care rulează în aceeași origine (domeniu), deci evitați stocarea informațiilor sensibile, cum ar fi parolele sau token-urile de autentificare.
