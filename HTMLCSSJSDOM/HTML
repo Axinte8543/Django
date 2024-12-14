@@ -145,7 +145,8 @@ method="POST": Trimite datele folosind metoda POST
 <link rel="stylesheet" href="./styles/header.css"> #ca sa folosim css din styles/header.css
 --in HTML exista cai relative si cai absolute iar acesta este un exemplu de cale relativa
 
---Căile absolute sunt specificate începând cu rădăcina sistemului de fișiere sau cu rădăcina site-ului web.Căile relative sunt specificate relativ la locația actuală a paginii sau fișierului HTML care le folosește. ./ il folosim cand css-ul se afla in aceleasi director cu htmlul
+--Căile absolute sunt specificate începând cu rădăcina sistemului de fișiere sau cu rădăcina site-ului web.Căile relative sunt specificate relativ la locația actuală a paginii sau fișierului HTML care le folosește.
+--./ il folosim cand css-ul se afla in aceleasi director cu htmlul
 
 Diferenta dintre id si class:
 1.Id-ul are prioritate mai mare ca clasa
