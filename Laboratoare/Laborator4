@@ -163,3 +163,11 @@ Django permite personalizarea ușoară a interfeței admin, atât la nivel de te
 admin.site.site_header = "Panou de Administrare Site"
 admin.site.site_title = "Admin Site"
 admin.site.index_title = "Bine ai venit în panoul de administrare"
+
+
+Rezumat:
+Filtre
+Ordonare
+Aggregate
+Modul admin Optiuni De Personalizare
+Relatii de Modele
