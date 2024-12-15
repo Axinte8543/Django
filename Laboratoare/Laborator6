@@ -245,4 +245,8 @@ SESSION_COOKIE_HTTPONLY = True --blocheaza accesul la cookieuri din JavaScript
 SESSION_COOKIE_SAMESITE = 'Lax' --alta masura de securitate
 
 
-
+Rezumat:
+Logarea
+Inregistrarea
+Schimbarea parolei
+Cum sa creezi un utilizator nou ca admin
