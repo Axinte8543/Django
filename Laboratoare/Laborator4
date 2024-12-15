@@ -4,7 +4,8 @@ produse = Produs.objects.all()
 primele_trei = Produs.objects.all()[:3]
 
 Filtre:
-Pentru a obține obiecte care îndeplinesc anumite condiții, poți folosi metoda filter(), iar pentru a le exclude, folosim exclude(). Aceste funcții acceptă drept parametrii criterii de filtrare.O folosim in views.py
+Pentru a obține obiecte care îndeplinesc anumite condiții, poți folosi metoda filter(), iar pentru a le exclude, folosim exclude(). 
+Aceste funcții acceptă drept parametrii criterii de filtrare.O folosim in views.py
 Operatorii de filtrare principali:
 field__lt: mai mic decât
 field__lte: mai mic sau egal cu
@@ -75,7 +76,9 @@ carti = Carte.objects.raw(
 
 
 Modul admin
-În Django, modul admin este o interfață predefinită pentru administrarea datelor din aplicație. Acest panou de administrare permite utilizatorilor (în special administratorilor și editorilor) să gestioneze datele aplicației fără a scrie cod. De asemenea, adminul Django este ușor de configurat și de personalizat.
+În Django, modul admin este o interfață predefinită pentru administrarea datelor din aplicație. 
+Acest panou de administrare permite utilizatorilor (în special administratorilor și editorilor) să gestioneze datele aplicației fără a scrie cod. 
+De asemenea, adminul Django este ușor de configurat și de personalizat.
 
 Pentru a crea un superutilizator cu scopul de a avea acces la panoul de administrare, se rulează comanda:
 python manage.py createsuperuser
