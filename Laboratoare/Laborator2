@@ -136,3 +136,9 @@ ceva.html
 <h1>{{ title }}</h1>
 <p>{{ content }}</p>
 {% endblock %}
+
+
+Rezumat:
+Rute dinamice
+Expresii regulate in Python
+Extinderea unui Template
