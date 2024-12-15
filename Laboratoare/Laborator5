@@ -15,8 +15,10 @@ method: metoda de trimitere a datelor (GET sau POST). GET trimite datele în URL
 
 
 Clasa form:
-Clasa Form (din pachetul forms) este folosită pentru a crea formulare HTML, a gestiona datele introduse de utilizatori și a efectua validări.  Îl folosim în special pentru cazul în care dorim formulare independente de baza de date (altfel vom folosi forms.ModelForm).
-Un formular Django presupune definirea unei clase care moștenește clasa forms.Form. În această clasă, putem specifica câmpurile formularului, fiecare câmp fiind definit ca o instanță a unei clase de câmp specific (de exemplu, CharField, EmailField, etc.).
+Clasa Form (din pachetul forms) este folosită pentru a crea formulare HTML, a gestiona datele introduse de utilizatori și a efectua validări. 
+Îl folosim în special pentru cazul în care dorim formulare independente de baza de date (altfel vom folosi forms.ModelForm).
+Un formular Django presupune definirea unei clase care moștenește clasa forms.Form. 
+În această clasă, putem specifica câmpurile formularului, fiecare câmp fiind definit ca o instanță a unei clase de câmp specific (EmailField, CharField, etc.).
 
 Exemplu:
 Aduagam in forms.py
@@ -47,7 +49,8 @@ def contact_view(request):
             return redirect('mesaj_trimis') #daca formularul este valid, utilizatorul e redirectionat la o pagina cu mesajul asta
     else: #tipul de request este GET, inseamna ca cererea vine din accesarea paginii
         form = ContactForm() #form va primi o instanta goala a formularului
-    return render(request, 'aplicatie_exemplu/contact.html', {'form': form}) #afiseaza contact.html si trimie instanta de formular form si va afisa formularul pentru a fi completat sau pentru a arata erori
+    return render(request, 'aplicatie_exemplu/contact.html', {'form': form}) 
+                                   #afiseaza contact.html si trimie instanta de formular form si va afisa formularul pentru a fi completat sau pentru a arata erori
 
 Contact.html o sa contina
 <form method="post"> #metoda formularului 
@@ -148,7 +151,8 @@ class ContactForm(forms.Form):
 
 
 ModelForm
-ModelForm este o clasă Django care leagă un formular de un model din baza de date, astfel încât să fie create automat câmpuri pe baza atributelor modelului. Avantajul major al utilizării ModelForm este că se economisește timp și se evită codul redundant pentru validări, deoarece:
+ModelForm este o clasă Django care leagă un formular de un model din baza de date, astfel încât să fie create automat câmpuri pe baza atributelor modelului. 
+Avantajul major al utilizării ModelForm este că se economisește timp și se evită codul redundant pentru validări, deoarece:
 
 Exemplu de formular bazat pe un model:
 Avem modelul:
@@ -208,7 +212,8 @@ class CarteForm(forms.ModelForm):
 
 
 Formset
-Un formset în Django este o colecție de formulare multiple de același tip, grupate împreună pentru a fi gestionate ca un singur obiect. Formset-urile sunt utile atunci când dorim să lucrăm cu o serie de instanțe ale unui formular – de exemplu, dacă dorim să adăugăm sau să edităm mai multe obiecte în același timp.
+Un formset în Django este o colecție de formulare multiple de același tip, grupate împreună pentru a fi gestionate ca un singur obiect. 
+Formset-urile sunt utile atunci când dorim să lucrăm cu o serie de instanțe ale unui formular – de exemplu, dacă dorim să adăugăm sau să edităm mai multe obiecte în același timp.
 
 from django import forms
 
