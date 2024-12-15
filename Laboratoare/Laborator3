@@ -71,12 +71,15 @@ data_nasterii = models.DateField()
 timp_start = models.TimeField()
 10.DateTimeField: Câmp pentru dată și timp complet. Acceptă și argumentele auto_now și auto_now_add.
 data_creare = models.DateTimeField(auto_now_add=True)
-11.DurationField: Câmp pentru a stoca durate de timp (diferențe de timp), reprezentate ca obiecte timedelta din Python. În PostgreSQL se stochează cu tipul de date interval. Exemple: intervale de timp precum durata unei activități, durata unei sesiuni sau timpul petrecut pe un anumit task.
+11.DurationField: Câmp pentru a stoca durate de timp (diferențe de timp), reprezentate ca obiecte timedelta din Python. 
+În PostgreSQL se stochează cu tipul de date interval. Exemple: intervale de timp precum durata unei activități, durata unei sesiuni sau timpul petrecut pe un anumit task.
 durata = models.DurationField()
 Adaugam in setting.py daca vrem sa adaugam fisiere sau imagini:
 MEDIA_ROOT = BASE_DIR / 'media'  # Directorul unde se stochează fișierele
 MEDIA_URL = '/media/'            # URL-ul pentru accesarea fișierelor
-12.FileField: Câmp pentru încărcarea fișierelor (cum ar fi documente PDF, imagini, videoclipuri, fișiere text etc.) în cadrul unui model. Necesită configurarea parametrului upload_to pentru a defini unde se vor salva fișierele.Crearea câmpului (fișierele încărcate sunt salvate în subdirectorul media/documente/):
+12.FileField: Câmp pentru încărcarea fișierelor (cum ar fi documente PDF, imagini, videoclipuri, fișiere text etc.) în cadrul unui model. 
+Necesită configurarea parametrului upload_to pentru a defini unde se vor salva fișierele.
+Crearea câmpului (fișierele încărcate sunt salvate în subdirectorul media/documente/):
 document = models.FileField(upload_to='documente/')
 13.ImageField: Similar cu FileField, dar verifică dacă fișierul este o imagine validă.
 image = models.ImageField(upload_to='images/')
