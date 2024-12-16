@@ -442,3 +442,145 @@ def register_view(request):
     <p>{{ error_message }}</p>
 </body>
 </html>
+
+
+
+4.Veți implementa un sistem de Logging pentru proiectul vostru. Sistemul de logging trebuie să aibă formatare atât pentru modul verbose cât și simple. 
+Sistemul de logging va implementa toate cele 5 nivele: DEBUG, INFO, WARNING, ERROR și CRITICAL.
+Veți afișa mesajele de tip WARNING, ERROR și CRITICAL în consolă, in formatul simple. În rest pentru fiecare tip de mesaje 
+veti avea alt fișier de log: debug.log, info.log, warning.log, error.log, critical.log. În fișiere veți afișa mesajele în formatul verbose.
+Folosind:
+logger = logging.getLogger('django')
+veți alege în codul vostru câte 2 locuri pentru fiecare dintre 5 nivele unde să transmiteți mesaje (adică două locuri în care trimiteți mesaje critice, două locuri cu eroare etc.)
+
+LOGGING = {
+    'version': 1, 
+    'disable_existing_loggers': False, 
+    'formatters': { 
+        'verbose': { 
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        }, 
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+     'handlers': { 
+        'console_warning': {
+            'level': 'WARNING', 
+            'class': 'logging.StreamHandler', 
+            'formatter': 'simple', 
+        },
+        'console_error': {
+            'level': 'ERROR', 
+            'class': 'logging.StreamHandler', 
+            'formatter': 'simple', 
+        },
+        'console_critical': {
+            'level': 'CRITICAL', 
+            'class': 'logging.StreamHandler', 
+            'formatter': 'simple', 
+        },
+        'file_debug': { 
+            'level': 'DEBUG', 
+            'class': 'logging.FileHandler', 
+            'filename': 'debugs.log',
+            'formatter': 'verbose',
+        },
+        'file_error': { 
+            'level': 'ERROR', 
+            'class': 'logging.FileHandler', 
+            'filename': 'errors.log',
+            'formatter': 'verbose',
+        },
+        'file_warning': { 
+            'level': 'WARNING', 
+            'class': 'logging.FileHandler', 
+            'filename': 'warnings.log',
+            'formatter': 'verbose',
+        },
+        'file_critical': { 
+            'level': 'CRITICAL', 
+            'class': 'logging.FileHandler', 
+            'filename': 'criticals.log',
+            'formatter': 'verbose',
+        },
+        'file_info': { 
+            'level': 'INFO', 
+            'class': 'logging.FileHandler', 
+            'filename': 'infos.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': { 
+        'django': { 
+            'handlers': ['console_warning', 'console_error', 'console_critical', 'file_debug', 'file_info', 'file_warning', 'file_error', 'file_critical'], 
+            'level': 'DEBUG', 
+            'propagate': True, 
+        },
+    },
+}
+
+Exemplu:
+def register_view(request):
+    if request.method == 'POST': 
+        form = CustomUserCreationForm(request.POST) 
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            if username == 'admin':
+                subject = "cineva incearca sa ne preia siteul"
+                email = form.cleaned_data['email']
+                message = f"Username: {username}\nEmail: {email}"
+                html_message = render_to_string('aplicatiedjango/inregistraregresitadmin.html', {
+                    'subject': subject,
+                    'username': username,
+                    'email': email
+                })
+                mail_admins(subject, message, html_message=html_message)
+                messages.error(request, 'Nu poti sa te inregistrezi cu username-ul admin. Administratorii au fost notificati.')
+                logger.warning('Tentativa de inregistrare cu username-ul admin.')                
+            else:
+                try:
+                    characters = string.ascii_letters + string.digits
+                    cod = ''.join(random.choices(characters, k=100))
+                    context = {
+                        'user': {
+                            'username': form.cleaned_data['username'],
+                            'name': form.cleaned_data['first_name'],
+                            'prenume': form.cleaned_data['last_name'],
+                            'cod': cod
+                        }
+                    }
+                    html_content = render_to_string('aplicatiedjango/email.html', context)
+                    email = EmailMessage(
+                        subject='Bun Venit',
+                        body=html_content,
+                        from_email="iniminiminimo3@gmail.com",
+                        to=['avrinterica@gmail.com']
+                        )
+                    email.content_subtype = "html"
+            
+                    image_path = os.path.join(settings.BASE_DIR, 'aplicatiedjango', 'static', 'images', 'theelephantman.jpg')
+                    email.attach_file(image_path)
+            
+                    email.send()
+                    user=form.save(commit=False)
+                    user.cod=cod
+                    user.save()
+                    logger.info('Utilizatorul a fost inregistrat cu succes.')                    
+                    return HttpResponse("Ca sa iti activezi contul, verifica email-ul") 
+                except Exception as e:
+                    subject = "Eroare la inregistrare"
+                    message = f"Username: {username}\nEmail: {email}\nError: {e}"
+                    html_message = render_to_string('aplicatiedjango/inregistraregresit.html', {
+                        'subject': subject,
+                        'error_message': str(e)
+                    })
+                    mail_admins(subject, message, html_message=html_message)
+                    messages.error(request, 'Eroare la inregistrare. Administratorii au fost notificati.')
+                    logger.error(f"Eroare la înregistrare: {str(e)}")                    
+                    return redirect('register')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'aplicatiedjango/inregistrare.html', {'form': form}) 
