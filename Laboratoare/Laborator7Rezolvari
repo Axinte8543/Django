@@ -1,0 +1,444 @@
+1.Utilizatorul va trebui să primească un mail de confirmare în momentul în care se înregistrează pe site. Taskul se va realiza în felul următor:
+
+Veți modifica modelul utilizator pentru a mai adăuga un câmp numit cod. Acesta va fi de tip sir de caractere cu lungime de maxim 100. 
+Veti lăsa acest camp si cu posibilitatea de a fi nul (pentru utilizatorii deja creati). 
+Veți mai crea si un câmp boolean numit email_confirmat, nenul, implicit fals.
+
+class CustomUser(AbstractUser):
+    telefon = models.CharField(max_length=10, blank=True)
+    adresa = models.CharField(max_length=50, blank=True)
+    tara = models.CharField(max_length=20, blank=True)
+    oras = models.CharField(max_length=20, blank=True)
+    codpostal1 = models.CharField(max_length=6, blank=True)
+    cod = models.CharField(max_length=100, null=True)
+    confirmare_email = models.BooleanField(default=False)
+
+
+La înregistrarea unui utilizator veți genera un string aleator care va fi setat în câmpul cod al utilizatorului
+Veți crea un template pentru e-mailul de confirmare în care veți ura "bun venit" utilizatorului pe site. 
+În template se va specifica numele, prenumele și username-ul acestuia, cât și linkul de confirmare al e-mailului. 
+Linkul de confirmare va avea formatul: /confirma_mail/cod/ unde cuvântul cod va fi înlocuit cu codul generat, de exemplu:/confirma_mail/mdj0iSSA1957a1pQ
+
+def register_view(request):
+    if request.method == 'POST': 
+        form = CustomUserCreationForm(request.POST) 
+        if form.is_valid():
+            characters = string.ascii_letters + string.digits
+            cod = ''.join(random.choices(characters, k=100))
+            context = {
+                'user': {
+                    'username': form.cleaned_data['username'],
+                    'name': form.cleaned_data['first_name'],
+                    'prenume': form.cleaned_data['last_name'],
+                    'cod': cod
+                }
+            }
+            html_content = render_to_string('aplicatiedjango/email.html', context)
+            email = EmailMessage(
+                subject='Bun Venit',
+                body=html_content,
+                from_email="iniminiminimo3@gmail.com",
+                to=['avrinterica@gmail.com']
+                )
+            email.content_subtype = "html"
+            image_path = os.path.join(settings.BASE_DIR, 'aplicatiedjango', 'static', 'images', 'theelephantman.jpg')
+            email.attach_file(image_path)
+            email.send()
+            user=form.save(commit=False)
+            user.cod=cod
+            user.save()
+            return HttpResponse("Ca sa iti activezi contul, verifica email-ul") 
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'aplicatiedjango/inregistrare.html', {'form': form}) 
+
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <h1>Bun Venit, {{ user.name }} {{ user.prenume }}!</h1>
+    <p>Utilizatorul tău este: {{ user.username }}</p>
+    <p>Linkul tau de confirmare este http://127.0.0.1:8000/aplicatie/confirma_mail/{{ user.cod}}</p>
+</body>
+</html>
+
+
+La click pe linkul respectiv se cauta in tabelul de utilizatori codul, si pentru utilizatorul respectiv se confirma e-mailul 
+(se setează câmpul email_confirmat pe True). Iar în pagina afișată se va afișa un mesaj de confirmare.
+def confirma_mail(request,cod):
+    user = CustomUser.objects.filter(cod=cod).first()
+    if user is not None:
+        user.confirmare_email = True
+        user.save()
+    else:
+        raise PermissionDenied
+    return render(request, 'aplicatiedjango/confirmareemail.html', {'user': user})
+
+
+Dacă un utilizator încearcă să se logheze înainte de a confirmat e-mailul, i se va afișa un mesaj de eroare.
+Utilizatorii se vor putea loga după ce au e-mailul confirmat.
+def custom_login_view(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(data=request.POST, request=request)
+        if form.is_valid():
+            user = form.get_user() 
+            if user is not None and user.confirmare_email == True:
+                login(request, user)
+                request.session['user_data'] = {
+                    'username': user.username,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'email': user.email,
+                    'telefon': user.telefon,
+                    'adresa': user.adresa,
+                    'tara': user.tara,
+                    'oras': user.oras,
+                    'codpostal1': user.codpostal1,
+                    'cod': user.cod,
+                    'confirmare_email': user.confirmare_email
+                }
+                if not form.cleaned_data.get('ramane_logat'):
+                    request.session.set_expiry(0)
+                else: 
+                    request.session.set_expiry(24*60*60)           
+                return redirect('profile')
+            if user.confirmare_email == False:
+                messages.warning(request, 'Email-ul nu a fost confirmat')
+        else:
+            messages.error(request, 'Autentificare esuata. Verifica datele introduse.')    
+    else:
+        form = CustomAuthenticationForm()
+    return render(request, 'aplicatiedjango/login.html', {'form': form})
+
+
+2.Veți implementa un sistem de promoții (realizat prin trimitere de mailuri), în următorul mod:
+
+Veți crea un tabel numit vizualizări unde veți salva ultimele N produse vizualizate de către utilizatori.
+De exemplu, N poate fi egal cu 5. Tabelul va conține id-ul utilizatorului, id-ul produsului și data vizualizării. 
+
+class Vizualizari(models.Model):
+      user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+      product=models.ForeignKey(Carte, on_delete=models.CASCADE)
+      date_viewed = models.DateTimeField(auto_now_add=True)
+      
+      class Meta:
+          ordering = ['-date_viewed']
+
+
+Când se introduce în tabel o înregistrare cu o vizualizare nouă, se verifică dacă pentru utilizator nu se depășesc deja N vizualizări. 
+Dacă se depășesc, se sțerge cea mai veche vizualizare.
+
+@login_required
+def vizualizari(request, id_produs):
+    product = get_object_or_404(Carte, IDCarte=id_produs)
+    user = request.user
+    N = 5  # Numărul maxim de vizualizări
+
+    # Adaugă noua vizualizare
+    Vizualizari.objects.create(user=user, product=product, date_viewed=timezone.now())
+    # Verifică dacă utilizatorul are mai mult de N vizualizări
+    vizualizari_user = Vizualizari.objects.filter(user=user).order_by('-date_viewed')
+    print(vizualizari_user.count())
+    if vizualizari_user.count() > N:
+        # Șterge cele mai vechi vizualizări care depășesc N
+        for vizualizare in vizualizari_user[N:]:
+            vizualizare.delete()
+
+    return redirect('index')  # Redirecționează către o altă pagină după salvarea vizualizării
+
+
+Veți crea un tabel numit promoții care va avea câmpurile nume, data_creare, data_expirare și minim înca 2 câmpuri alese de voi. 
+
+class Promotii(models.Model):
+      nume = models.CharField(max_length=50)
+      data_creare = models.DateField()
+      data_expirare = models.DateField()
+      procent = models.IntegerField()
+      codpromotional = models.CharField(max_length=10)
+
+
+Veți alege o caracteristică a produselor pentru care doriți să faceți promoții, de exemplu, categoria (dar poate fi absolut orice coloană din tabelul de produse).
+Se consideră că o promoție e valabilă pentru mai multe categorii în același timp. 
+Veți face minim 2 template-uri de e-mail care vor conține mesaje personalizate pentru categoriile pentru care se fac promoțiile. 
+Aceste template-uri vor trebui să aibă în conținut următoarele variabile:
+subiectul mesajului
+data expirării promotiei
+eventuale alte date relevante
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ subject }}</title>
+</head>
+<body>
+    <h1>Reduceri pentru autorul {{ autor }}</h1>
+    <p>Salutare,</p>
+    <p>Suntem bucuroși să vă anunțăm că avem reduceri pentru cărțile autorului {{ autor }}.</p>
+    <p>Promoția este valabilă până pe {{ data_expirare }}.</p>
+    <p>Folosiți codul promoțional: {{ codpromotional }} ca sa aveti reducere de {{procent}}%</p>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ subject }}</title>
+</head>
+<body>
+    <h1>Promoție pentru autorul {{ autor }}</h1>
+    <p>Dragi cititori,</p>
+    <p>Avem o promoție specială pentru cărțile autorului {{ autor }}. Nu ratați această ocazie!</p>
+    <p>Promoția expiră pe {{ data_expirare }}.</p>
+    <p>Cod promoțional: {{ codpromotional }}</p>
+</body>
+</html>
+
+
+Va exista o pagină, numită /promotii care va avea un formular cu câmpurile: subiect și mesaj, nume promotie, timp promotie, 
+un choice field multiplu cu categoriile pentru care dorim să facem promotiile (veti pune doar categoriile pentru care aveti template-uri). 
+Implicit sunt toate selectate, și câmpuri corespunzătoare  coloanelor alese de voi
+
+CATEGORII_CHOICES = [('Jane Austen', 'Jane Austen'), ('F. Scott Fitzgerald', 'F. Scott Fitzgerald')]
+class PromotiiForm(forms.ModelForm):
+    subiect = forms.CharField(max_length=100, label='Subiect')
+    mesaj = forms.CharField(widget=forms.Textarea, label='Mesaj')
+    categorii = forms.MultipleChoiceField(
+        choices=CATEGORII_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        label='Categorii',
+        initial=[choice[0] for choice in CATEGORII_CHOICES]
+    )
+    class Meta:
+        model = Promotii
+        fields = ['nume', 'data_creare', 'data_expirare', 'procent', 'codpromotional']
+
+
+La submit, se vor introduce datele unei noi promotii în tabel. În același timp se vor selecta pentru categoriile pentru care ați ales să faceți promoții 
+utilizatorii care au avut minim K vizualizări cu produse din acea categorie, unde K e ales de voi (K < N)
+Folosind functia send_mass_mail() veți grupa userii pentru fiecare categorie în parte și veți trimite printr-o singură comandă mailurile cu template-urile 
+pentru toate promoțiile.
+
+def promotii_view(request):
+    K = 3  # Numărul minim de vizualizări pentru a primi promoția
+    if request.method == 'POST':
+        form = PromotiiForm(request.POST)
+        if form.is_valid():
+            promotie = form.save()
+            subiect = form.cleaned_data['subiect']
+            mesaj = form.cleaned_data['mesaj']
+            categorii = form.cleaned_data['categorii']
+            emails = []
+            for categorie in categorii:
+                produse = Carte.objects.filter(Autor=categorie)
+                utilizatori = set()
+                
+                for produs in produse:
+                    vizualizari = Vizualizari.objects.filter(product=produs).values('user').annotate(count=models.Count('user')).filter(count__gte=K)
+                    utilizatori.update(vizualizari.values_list('user', flat=True))
+                if utilizatori:
+                    context = {
+                        'subiect': subiect,
+                        'autor': categorie,
+                        'data_expirare': promotie.data_expirare,
+                        'codpromotional': promotie.codpromotional,
+                        'procent': promotie.procent,
+                        'mesaj': mesaj
+                    }
+                    html_content = render_to_string(f'aplicatiedjango/carteAustin.html', context)
+                    for user_id in utilizatori:
+                        user = CustomUser.objects.get(id=user_id)
+                        emails.append((subiect, html_content, 'iniminiminimo3@gmail.com', [user.email]))
+            send_mass_mail(emails) #nu merge sa trimiti html cu send_mass_mail
+            messages.success(request, 'Promoțiile au fost trimise cu succes.')
+            return redirect('index')
+    else:
+        form = PromotiiForm()
+    return render(request, 'aplicatiedjango/promotii.html', {'form': form})
+
+
+
+3.Pentru cerintele urmatoare se va folosi functia mail_admins(). Veti defini minim 2 administratori de site in settings.py. 
+Mailurile se vor trimite și in format text si html. In formatul html, subiectul mesajului va fi scris si in textul mesajului cu un tag h1 de culoare rosie(deci stilizat). 
+Se vor implementa următoarele măsuri de securitate pentru site:
+
+-dacă un user încearcă să se logheze de 3 ori în mai puțin de 2 minute pe site și eșuează de fiecare dată, 
+se va trimite un mail către administratori cu subiectul "Logari suspecte", username-ul cu care s-a incercat logarea și ip-ul de pe care s-a incercat logarea.
+
+def custom_login_view(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(data=request.POST, request=request)
+        username = request.POST.get('username')
+        ip_address = request.META.get('REMOTE_ADDR')
+        cache_key = f'login_attempt_{username}_{ip_address}'
+        attempts = cache.get(cache_key, 0)
+        
+        if form.is_valid():
+            user = form.get_user() 
+            if user is not None and user.confirmare_email == True:
+                login(request, user)
+                request.session['user_data'] = {
+                    'username': user.username,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'email': user.email,
+                    'telefon': user.telefon,
+                    'adresa': user.adresa,
+                    'tara': user.tara,
+                    'oras': user.oras,
+                    'codpostal1': user.codpostal1,
+                    'cod': user.cod,
+                    'confirmare_email': user.confirmare_email
+                }
+                if not form.cleaned_data.get('ramane_logat'):
+                    request.session.set_expiry(0)
+                else: 
+                    request.session.set_expiry(24*60*60)     
+                cache.delete(cache_key)          
+                return redirect('profile')
+            if user.confirmare_email == False:
+                messages.warning(request, 'Email-ul nu a fost confirmat')
+        else:
+            attempts = attempts + 1
+            cache.set(cache_key, attempts, timeout=120)  
+            if attempts >= 3:
+                subject = "Logari suspecte"
+                message = f"Username: {username}\nIP Address: {ip_address}"
+                html_message = render_to_string('aplicatiedjango/logingresit.html', {
+                    'subject': subject,
+                    'username': username,
+                    'ip_address': ip_address
+                })
+                mail_admins(subject, message, html_message=html_message)
+                messages.error(request, 'Autentificare esuata de prea multe ori. Administratorii au fost notificati.')
+            else:
+                messages.error(request, 'Autentificare esuata. Verifica datele introduse.')    
+    else:
+        form = CustomAuthenticationForm()
+    return render(request, 'aplicatiedjango/login.html', {'form': form})
+
+
+-dacă un user încearcă să se înregistreze cu username-ul admin, se va trimite un mesaj către administratorii site-ului cu subiectul 
+"cineva incearca sa ne preia site-ul" si adresa de e-mail de pe care s-a incercat inregistrarea. Inregistrarea va fi, evident, refuzată
+
+def register_view(request):
+    if request.method == 'POST': 
+        form = CustomUserCreationForm(request.POST) 
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            if username == 'admin':
+                subject = "cineva incearca sa ne preia siteul"
+                email = form.cleaned_data['email']
+                message = f"Username: {username}\nEmail: {email}"
+                html_message = render_to_string('aplicatiedjango/logingresitadmin.html', {
+                    'subject': subject,
+                    'username': username,
+                    'email': email
+                })
+                mail_admins(subject, message, html_message=html_message)
+                messages.error(request, 'Nu poti sa te inregistrezi cu username-ul admin. Administratorii au fost notificati.')
+            else:
+                characters = string.ascii_letters + string.digits
+                cod = ''.join(random.choices(characters, k=100))
+                context = {
+                    'user': {
+                        'username': form.cleaned_data['username'],
+                        'name': form.cleaned_data['first_name'],
+                        'prenume': form.cleaned_data['last_name'],
+                        'cod': cod
+                    }
+                }
+                html_content = render_to_string('aplicatiedjango/email.html', context)
+                email = EmailMessage(
+                    subject='Bun Venit',
+                    body=html_content,
+                    from_email="iniminiminimo3@gmail.com",
+                    to=['avrinterica@gmail.com']
+                    )
+                email.content_subtype = "html"
+            
+                image_path = os.path.join(settings.BASE_DIR, 'aplicatiedjango', 'static', 'images', 'theelephantman.jpg')
+                email.attach_file(image_path)
+            
+                email.send()
+                user=form.save(commit=False)
+                user.cod=cod
+                user.save()
+                return HttpResponse("Ca sa iti activezi contul, verifica email-ul") 
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'aplicatiedjango/inregistrare.html', {'form': form}) 
+
+veti alege voi o zonă de cod pe care o veti pune in try... except si dacă aceasta dă eroare se va trimite un e-mail către administratori cu eroarea. 
+În mesajul html, eroarea va avea background rosu.
+
+def register_view(request):
+    if request.method == 'POST': 
+        form = CustomUserCreationForm(request.POST) 
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            if username == 'admin':
+                subject = "cineva incearca sa ne preia siteul"
+                email = form.cleaned_data['email']
+                message = f"Username: {username}\nEmail: {email}"
+                html_message = render_to_string('aplicatiedjango/logingresitadmin.html', {
+                    'subject': subject,
+                    'username': username,
+                    'email': email
+                })
+                mail_admins(subject, message, html_message=html_message)
+                messages.error(request, 'Nu poti sa te inregistrezi cu username-ul admin. Administratorii au fost notificati.')
+            else:
+                try:
+                    characters = string.ascii_letters + string.digits
+                    cod = ''.join(random.choices(characters, k=100))
+                    context = {
+                        'user': {
+                            'username': form.cleaned_data['username'],
+                            'name': form.cleaned_data['first_name'],
+                            'prenume': form.cleaned_data['last_name'],
+                            'cod': cod
+                        }
+                    }
+                    html_content = render_to_string('aplicatiedjango/email.html', context)
+                    email = EmailMessage(
+                        subject='Bun Venit',
+                        body=html_content,
+                        from_email="iniminiminimo3@gmail.com",
+                        to=['avrinterica@gmail.com']
+                        )
+                    email.content_subtype = "html"
+            
+                    image_path = os.path.join(settings.BASE_DIR, 'aplicatiedjango', 'static', 'images', 'theelephantman.jpg')
+                    email.attach_file(image_path)
+            
+                    email.send()
+                    user=form.save(commit=False)
+                    user.cod=cod
+                    user.save()
+                    return HttpResponse("Ca sa iti activezi contul, verifica email-ul") 
+                except Exception as e:
+                    subject = "Eroare la inregistrare"
+                    message = f"Username: {username}\nEmail: {email}\nError: {e}"
+                    html_message = render_to_string('aplicatiedjango/inregistraregresit.html', {
+                        'subject': subject,
+                        'error_message': str(e)
+                    })
+                    mail_admins(subject, message, html_message=html_message)
+                    messages.error(request, 'Eroare la inregistrare. Administratorii au fost notificati.')
+                    return redirect('register')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'aplicatiedjango/inregistrare.html', {'form': form}) 
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ subject }}</title>
+</head>
+<body>
+    <h1 style="background-color: red;">{{ subject }}</h1>
+    <p>{{ error_message }}</p>
+</body>
+</html>
