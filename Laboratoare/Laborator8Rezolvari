@@ -1,0 +1,42 @@
+1.Realizați un template pentru eroarea 403 care să aibă un mesaj în care se specifică faptul că nu este permis accesul la resursa curentă.
+Template-ul va avaea următorul comportament:
+Dacă e un user logat, pe pagină se va afișa textul "Salut [username]", înlocuind [username] cu username-ul celui logat. Dacă nu e logat, se va afișa "Salut preastimate anonim"
+Va exista o variabila titlu folosită într-un tag h1, care dacă este vid va afișa direct "Eroare 403".
+Va exista o variabilă mesaj_personalizat care va fi populată cu un mesaj personalizat în funcție de motivul erorii 403.
+
+Mai intai schimbam in /admin setarile astfel incat noi sa putem sa avem voie sa adaugam albume
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eroare</title>
+</head>
+<body>
+    {% if user.username %}
+        <p>Salut {{user.username}}</p>
+    {%else%}
+        <p>Salut, preastimate anonim</p>
+    {% endif %}
+    <h1>403 Eroare</h1>
+    <p>{{ message }}</p>
+</body>
+</html>
+
+def creare_album(request):
+    if request.user.has_perm('aplicatiedjango.add_albummuzical'):
+        if request.method == 'POST':
+            form = AlbumMuzical(request.POST)
+            if form.is_valid():
+                album = form.save(commit=False)
+                album.DurataAlbum = form.cleaned_data['DurataAlbum']
+                album.Pret = form.cleaned_data['Pret']
+                album.Discount = form.cleaned_data.get('Discount', 0)
+                album.PretFinal = form.cleaned_data.get('PretFinal', album.Pret)           
+                album.save()
+                return redirect('mesaj_trimis')
+        else:
+            form=AlbumMuzical()
+        return render(request, 'aplicatiedjango/album.html', {'form': form})
+    else:
+        context = {'message': 'Nu ai permisiuni pentru a accesa aceasta pagina deoarece nu poti sa adaugi albume.', 'user.username': request.user.username}
+        return render(request, 'aplicatiedjango/403html.html', context)
