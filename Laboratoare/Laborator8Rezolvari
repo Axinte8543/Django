@@ -53,3 +53,99 @@ def creare_album(request):
     else:
         context = {'message': 'Nu ai voie sa adaugi albume.', 'user.username': request.user.username}
         return HttpResponseForbidden(render(request, 'aplicatiedjango/403html.html',context))
+
+
+3.Veți crea o permisiune numită vizualizeaza_oferta, cu ce descriere vreti voi. Pe una dintre pagini, 
+cu javascript client veti face sa se afiseze in mod aleator (cu o probabilitate de 30%) un banner animat cu textul oferta reducere 50% doar pentru utilizatorii logati. 
+Dacă un utilizator logat dă click pe acel banner, i se alocă automat permisiunea vizualizeaza_oferta si e redirectionat spre o pagina numita oferta (unde scrieti voi ce vreti). 
+Permisiunea insa dispare in momentul in care utilizatorul se delogheaza de pe site.
+Dacă un utilizator care nu are permisiunea să vadă oferta intră pe pagina de oferte, veți returna un răspuns de tip HttpResponseForbidden 
+folosind template-ul de mai sus cu titlul "Eroare afisare oferta" și textul "Nu ai voie să vizualizezi oferta".
+
+Mai intai trebuie sa schimbam numele formularului AlbumMuzical in AlbumMuzicalForm deoarece s-ar putea interpreta gresit in views
+
+class AlbumMuzical(models.Model):
+    IDAlbum = models.PositiveIntegerField(primary_key=True, unique=True)
+    IDProdus = models.OneToOneField(Produs, on_delete=models.CASCADE)
+    Titlu = models.CharField(max_length=50)
+    An = models.PositiveIntegerField()
+    Artist=models.CharField(max_length=30)
+    DurataAlbum = models.PositiveIntegerField()
+    NumarPiese= models.PositiveIntegerField()
+    GenAlbum = models.CharField(max_length=30)
+    Pret = models.DecimalField(max_digits=8, decimal_places=2)
+    EsteRomanesc = models.BooleanField()
+    
+    class Meta:
+        permissions = [
+            ("vizualizeaza_oferta", "Poti vizualiza oferta"),
+        ]
+
+@login_required
+def profile(request):
+    user_data = request.session.get('user_data', {})
+    show_banner = random.random() < 0.3
+    return render(request, 'aplicatiedjango/profile.html', {'user_data': user_data, 'show_banner': show_banner})
+
+def aloca_permisiune_oferta(request):
+    if request.user.is_authenticated:
+        content_type = ContentType.objects.get_for_model(AlbumMuzical)
+        permission = Permission.objects.get(codename='vizualizeaza_oferta', content_type=content_type)
+        request.user.user_permissions.add(permission)
+        return redirect('oferta')
+    else:
+        return redirect('custom_login_view')
+    
+@login_required
+def oferta_view(request):
+    if request.user.has_perm('aplicatiedjango.vizualizeaza_oferta'):
+        return render(request, 'aplicatiedjango/oferta.html')
+    else:
+        context = {
+            'title': 'Eroare afisare oferta',
+            'message': 'Nu ai voie să vizualizezi oferta.',
+        }
+        return HttpResponseForbidden(render(request, 'aplicatiedjango/403html.html', context))
+
+
+profile.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profilul Meu</title>
+</head>
+<body>
+    <h1>Profilul Meu</h1>
+    <ul>
+        <li>Nume utilizator: {{ user_data.username }}</li>
+        <li>Prenume: {{ user_data.first_name }}</li>
+        <li>Nume: {{ user_data.last_name }}</li>
+        <li>Email: {{ user_data.email }}</li>
+        <li>Telefon: {{ user_data.telefon }}</li>
+        <li>Adresa: {{ user_data.adresa }}</li>
+        <li>Țara: {{ user_data.tara }}</li>
+        <li>Oraș: {{ user_data.oras }}</li>
+        <li>Cod Poștal: {{ user_data.codpostal1 }}</li>
+    </ul>
+    <a href="{% url 'change_password' %}">Schimbă Parola</a>
+    <a href="{% url 'custom_logout_view' %}">Deconectare</a>
+    
+    {% if show_banner %}
+    <div class="banner" id="offer-banner">
+        Oferta reducere 50%
+    </div>
+    {% endif %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var banner = document.getElementById('offer-banner');
+            if (banner) {
+                banner.style.display = 'block';
+                banner.addEventListener('click', function() {
+                    window.location.href = "{% url 'aloca_permisiune_oferta' %}";
+                });
+            }
+        });
+    </script>
+</body>
+</html>
