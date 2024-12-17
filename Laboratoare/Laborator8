@@ -35,6 +35,22 @@ După definirea permisiunilor, trebuie să rulați:
 python manage.py makemigrations
 python manage.py migrate
 
+Crearea permisiunilor in afara clasei:
+
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from .models import Carte
+
+name: Numele descriptiv al permisiunii, vizibil în interfața de administrare.
+content_type: Asociază permisiunea cu un model specific.
+content_type = ContentType.objects.get_for_model(Carte) --obtinem modelul carte
+
+permission = Permission.objects.create(
+    codename='doneaza_biblioteca',
+    name='Poate trimite spre biblioteca',
+    content_type=content_type
+
+
 Permisiunile utilizatorilor
 Atributul user_permissions al modelului User reprezintă relația Many-to-Many între un utilizator și permisiunile sale personalizate.
 Este o modalitate prin care un utilizator poate primi permisiuni individuale, fără a fi nevoie să aparțină unui grup.
