@@ -63,6 +63,7 @@ Dacă un utilizator care nu are permisiunea să vadă oferta intră pe pagina de
 folosind template-ul de mai sus cu titlul "Eroare afisare oferta" și textul "Nu ai voie să vizualizezi oferta".
 
 Mai intai trebuie sa schimbam numele formularului AlbumMuzical in AlbumMuzicalForm deoarece s-ar putea interpreta gresit in views
+Mai trebuie sa facem bannerul animat
 
 class AlbumMuzical(models.Model):
     IDAlbum = models.PositiveIntegerField(primary_key=True, unique=True)
