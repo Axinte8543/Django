@@ -22,8 +22,21 @@ Mai intai schimbam in /admin setarile astfel incat noi sa putem sa avem voie sa 
 </body>
 </html>
 
+
+2.Adaugați în interfața admin modelul pentru utilizatorul personalizat pe care l-ati creat (cel cu câmpurile suplimentare). 
+Atunci când creați un utilizator (imediat după ce introduceți username-ul și parola și îl salvați) pe ecranul cu datele adiționale, trebuie să apară și câmpurile suplimentare. 
+Creati un astfel de utilizator în interfața admin.
+Creați în interfața admin un grup numit "Administratori_produse" și dați toate drepturile asupra produselor site-ului vostru pentru acest grup. 
+Asociați un utilizator (a cărui parolă o știți) acestui grup.
+Protejați formularul de adăugare produse creat într-un task anterior, verificând dacă utilizatorul care a făcut cererea de a accesa pagina formularului are 
+într-adevăr dreptul de a adăuga produse. Dacă nu are acest drept, veți returna un răspuns de tip HttpResponseForbidden folosind template-ul de mai sus cu titlul 
+"Eroare adaugare produse" și textul "Nu ai voie să adaugi [produse]" înlocuind [produse] cu ce fel de produse aveți voi pe site.
+
+Mai intai cream utilizatorul cineva123 cu parola Stefi8543
+Cream grupul Administratori_produse
+
 def creare_album(request):
-    if request.user.has_perm('aplicatiedjango.add_albummuzical'):
+    if request.user.has_perm('aplicatiedjango.administratori_produse'):
         if request.method == 'POST':
             form = AlbumMuzical(request.POST)
             if form.is_valid():
@@ -38,5 +51,5 @@ def creare_album(request):
             form=AlbumMuzical()
         return render(request, 'aplicatiedjango/album.html', {'form': form})
     else:
-        context = {'message': 'Nu ai permisiuni pentru a accesa aceasta pagina deoarece nu poti sa adaugi albume.', 'user.username': request.user.username}
-        return render(request, 'aplicatiedjango/403html.html', context)
+        context = {'message': 'Nu ai voie sa adaugi albume.', 'user.username': request.user.username}
+        return HttpResponseForbidden(render(request, 'aplicatiedjango/403html.html',context))
