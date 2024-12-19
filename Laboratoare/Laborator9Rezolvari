@@ -1,0 +1,8 @@
+1.Folosiți framework-ul de mesaje în cadrul aplicației. Folosiți fiecare tip de mesaj (debug, info, succes, warning, error) de minim 2 ori în cadrul aplicației în locuri relevante.
+
+Adaugam in views.py messages.debug,messages.info....
+messages.debug nu o sa se vada utilizatorului
+
+2.Generați un sitemap pentru aplicație incluzând toate modelele relevante (nu uitati sa faceti paginile proprii pentru modele, de exemplu: /model/id) și 
+paginile statice care nu depind de logarea utilizatorilor.
+
