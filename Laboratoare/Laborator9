@@ -138,7 +138,7 @@ class VederiStaticeSitemap(Sitemap):
         return reverse(item) --Primește fiecare item din lista items și generează URL-ul corespunzător folosind funcția reverse
 
 
-Adaugarea sitemap in urls.py
+Adaugarea sitemap in urls.py al aplicatiei
 from django.contrib.sitemaps.views import sitemap --O vizualizare generică Django pentru generarea automată a fișierului sitemap.xml
 from .sitemaps import CarteSitemap, VederiStaticeSitemap
 
