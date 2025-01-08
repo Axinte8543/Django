@@ -16,7 +16,7 @@ def cum_il_cheama(request):
     lista_nume= ("si "+" si ".join(lista_nume)) if lista_nume else "anonim"
     return HttpResponse(f"Pe coleg îl cheama {lista_nume}")
 http://localhost:8000/aplicatie_exemplu/cum_il_cheama_pe_coleg/?nume=ionel&nume=gigel&nume=costel
-
+path("cum_il_cheama_pe_coleg/", views.cum_il_cheama, name="cum_il_cheama")
 
 Caractere speciale in query string:
 ? - delimitează începutul unui query string https://example.com/search?query=python
