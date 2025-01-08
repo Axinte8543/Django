@@ -52,6 +52,7 @@ text = "xyzt 23abc 1014 abcd"
 rezultat = re.search(r'\d+', text) #primul numar gasit 23
 text = "abbacdaaaxyzb123"
 rezultate = re.findall(r'[ab]+', text) #toate sirurile care contin doar a si b
+Afiseaza ["abba", 'aaa', 'b']
 
 re_path(r'^pagina/a{2,4}\d+/$', views.afisare_pag) #/pagina/aaa19
 re_path(r'^pagina/[xyz]+/$', views.afisare_pag2) #/pagina/xyxyzzz
