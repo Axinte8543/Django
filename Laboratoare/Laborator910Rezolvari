@@ -1,0 +1,323 @@
+1.Implementati pentru cosul virtual următoarele:
+produsele din baza de date vor avea și un stoc asociat
+optiunea de a adauga in cosul virtual
+optiunea de a avea o anumita cantitate din fiecare produs in cosul virtual (de exemplu 10 itemuri dintr-un anumit produs)
+optiunea de a sterge complet un produs din cosul virtual (dispar toate item-urile)
+doua butoane de adaugare si de stergere a cate unui singur element din cosul virtual. de exemplu un buton cu textul + si unul cu -
+important! Nu putem pune in cosul virtual mai multe item-uri decat avem disponibile in stoc
+un camp de input in care utilizatorul poate trece direct valoarea pe care o doreste drept cantitate pentru produsele din cosul virtual.
+pentru produsele adaugate in cosul virtual se va crea un marcaj special pentru a arata ca sunt deja in cos
+optiunile de mai sus trebuie sa fie disponibile atat pe pagina pe care se gasesc listate toate produsele cat si pe pagina proprie fiecărui produs.
+
+<!DOCTYPE html>
+<html lang="ro">
+    <head>
+        <title>Filme</title>
+        <style>
+            article{
+                border:1px solid grey;
+            }
+        </style>
+        <script>
+            window.onload=function(){
+                let id_uri_cos=localStorage.getItem("cos_virtual") 
+                if (id_uri_cos){ 
+                    let vector_cos=id_uri_cos.split(",");
+                    let articole=document.getElementsByClassName("produs") 
+                    for(let articol of articole){ 
+                        for (let i=0;i<vector_cos.length;i++){ 
+                            let ifs=vector_cos[i].split("/")[0];
+                            if (ifs==articol.dataset["id"]){
+                                articol.style.borderColor="red";
+                            }
+                        }
+                    }
+                }
+                var butoane=document.getElementsByClassName("btn_cos_virtual");
+                for(let btn of butoane){
+                    btn.onclick=function(){ 
+                        let id_uri_cos=localStorage.getItem("cos_virtual") //luam din local storage
+                        if (id_uri_cos){ //daca sunt produse in cos
+                            let vector_cos=id_uri_cos.split(","); //facem un vector cu produsele din cos
+                            let ct=0; 
+                            let index=0;  
+                            for(let i=0;i<vector_cos.length;i++){  //parcuregem vectorul sa vedem daca produsul este deja in cos
+                                let ifs=vector_cos[i].split("/")[0];
+                                if (ifs==this.dataset["id"])
+                                {
+                                    index=i;
+                                    ct=ct+1;
+                                }
+                            } //daca este in cos, retinem indexul la care se afla
+                            if (ct==0){
+                                let ceva= this.dataset["id"]+'/'+1; 
+                                vector_cos.push(ceva) 
+                                localStorage.setItem("cos_virtual",vector_cos) //daca nu este in cos, il adaugam
+                            }
+                        }
+                        else{
+                            let ceva1 = this.dataset["id"]+'/'+1;
+                            localStorage.setItem("cos_virtual",ceva1) 
+                        }
+                    }
+                }
+            var butoane1=document.getElementsByClassName("btn_cos_virtual_stergere");    
+            for(let btn of butoane1){
+                btn.onclick=function(){
+                    let id_uri_cos=localStorage.getItem("cos_virtual")
+                    if (id_uri_cos){
+                            let vector_cos=id_uri_cos.split(","); //facem un vector cu produsele din cos 
+                            let ct=0; 
+                            let index=0;  
+                            for(let i=0;i<vector_cos.length;i++){  //parcuregem vectorul sa vedem daca produsul este deja in cos
+                                let ifs=vector_cos[i].split("/")[0];
+                                if (ifs==this.dataset["id"])
+                                {
+                                    index=i;
+                                    ct=ct+1;
+                                    break;
+                                }
+                            }
+                            if(ct==1){
+                            vector_cos.splice(index,1);
+                            localStorage.setItem("cos_virtual", vector_cos.join(",")); //daca este in cos, il stergem
+                            }
+                    }
+                }
+            }
+            var butoane2=document.getElementsByClassName("btn_cos_virtual_adauga");
+            for(let btn of butoane2){
+                btn.onclick=function(){ 
+                    let id_uri_cos=localStorage.getItem("cos_virtual") //luam din local storage
+                    if (id_uri_cos){ //daca sunt produse in cos
+                        let vector_cos=id_uri_cos.split(","); //facem un vector cu produsele din cos
+                        let ct=0; 
+                        let index=0;  
+                        for(let i=0;i<vector_cos.length;i++){  //parcuregem vectorul sa vedem daca produsul este deja in cos
+                            let ifs=vector_cos[i].split("/")[0];
+                            if (ifs==this.dataset["id"])
+                            {
+                                index=i;
+                                ct=ct+1;
+                            }
+                        } //daca este in cos, retinem indexul la care se afla
+                        if (ct==1){
+                            vector_cos[index]=this.dataset["id"]+'/'+(parseInt(vector_cos[index].split("/")[1])+1); 
+                            localStorage.setItem("cos_virtual",vector_cos) //daca este in cos, incrementam cantitatea
+                        }
+                    }
+                }
+            }
+            var butoane3=document.getElementsByClassName("btn_cos_virtual_scade");
+            for(let btn of butoane3){
+                btn.onclick=function(){ 
+                    let id_uri_cos=localStorage.getItem("cos_virtual") //luam din local storage
+                    if (id_uri_cos){ //daca sunt produse in cos
+                        let vector_cos=id_uri_cos.split(","); //facem un vector cu produsele din cos
+                        let ct=0; 
+                        let index=0;  
+                        for(let i=0;i<vector_cos.length;i++){  //parcuregem vectorul sa vedem daca produsul este deja in cos
+                            let ifs=vector_cos[i].split("/")[0];
+                            if (ifs==this.dataset["id"])
+                            {
+                                index=i;
+                                ct=ct+1;
+                            }
+                        } //daca este in cos, retinem indexul la care se afla
+                        if (ct==1){
+                            if(parseInt(vector_cos[index].split("/")[1])==1)
+                            {
+                                vector_cos.splice(index,1);
+                                localStorage.setItem("cos_virtual", vector_cos.join(",")); //daca este in cos, il stergem
+                            }
+                            else
+                            {vector_cos[index]=this.dataset["id"]+'/'+(parseInt(vector_cos[index].split("/")[1])-1); 
+                            localStorage.setItem("cos_virtual",vector_cos) //daca este in cos, incrementam cantitatea
+                            }
+                        }
+                    }
+                }
+            }
+
+            var inputuri=document.getElementsByClassName("cantitate");
+            for (let input of inputuri){
+                input.onchange = function() {
+                    let id = this.dataset["id"];  //id-ul produsului
+                    let cantitate = this.value; //cantitatea produsului
+                    let id_uri_cos = localStorage.getItem("cos_virtual"); //luam din local storage
+                    if (id_uri_cos) {
+                        let vector_cos=id_uri_cos.split(","); //facem un vector cu produsele din cos
+                        let ct=0; 
+                        let index=0;  
+                        for(let i=0;i<vector_cos.length;i++){  //parcuregem vectorul sa vedem daca produsul este deja in cos
+                            let ifs=vector_cos[i].split("/")[0];
+                            if (ifs==id)
+                            {
+                                index=i;
+                                ct=ct+1;
+                                break;
+                            }
+                        }
+                        if (ct==1) {
+                            if (cantitate==0) {
+                                vector_cos.splice(index,1);
+                                localStorage.setItem("cos_virtual", vector_cos.join(",")); //daca este in cos, il stergem
+                            }
+                            else {
+                            vector_cos[index]=id+'/'+cantitate; 
+                            localStorage.setItem("cos_virtual",vector_cos.join(",")) //daca este in cos, incrementam cantitatea
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+            
+        </script>
+    </head>
+    <body>
+	
+    {% for film in filme %}
+    <article data-id="{{ film.IDProdus }}" class="produs">
+    	<p>{{ film.Titlu }}</p>
+    	<p>{{ film.Pret }}</p>
+        <button data-id="{{ film.IDProdus }}" data-nume={{ film.Titlu }} class="btn_cos_virtual">Adauga in cos</button>
+        <button data-id="{{ film.IDProdus }}" data-nume={{ film.Titlu }} class="btn_cos_virtual_stergere">Sterge din cos</button>
+        <button data-id="{{ film.IDProdus }}" data-nume={{ film.Titlu }} class="btn_cos_virtual_adauga">+</button>
+        <button data-id="{{ film.IDProdus }}" data-nume={{ film.Titlu }} class="btn_cos_virtual_scade">-</button>
+        <input type="text" data-id="{{ film.IDProdus }}" name="cantitate" value="0" class="cantitate">
+    </article>
+    {% endfor %}
+
+    {% for album in albume %}
+    <article data-id="{{ album.IDProdus }}" class="produs">
+    	<p>{{ album.Titlu }}</p>
+    	<p>{{ album.Pret }}</p>
+        <button data-id="{{ album.IDProdus }}" data-nume={{ album.Titlu }} class="btn_cos_virtual">Adauga in cos</button>
+        <button data-id="{{ album.IDProdus }}" data-nume={{ album.Titlu }} class="btn_cos_virtual_stergere">Sterge din cos</button>
+        <button data-id="{{ album.IDProdus }}" data-nume={{ album.Titlu }} class="btn_cos_virtual_adauga">+</button>
+        <button data-id="{{ album.IDProdus }}" data-nume={{ album.Titlu }} class="btn_cos_virtual_scade">-</button>
+        <input type="text" data-id="{{ album.IDProdus }}" name="cantitate" value="0" class="cantitate">
+    </article>
+    {% endfor %}
+
+    {% for carte in carti %}
+    <article data-id="{{ carte.IDProdus }}" class="produs">
+    	<p>{{ carte.Titlu }}</p>
+    	<p>{{ carte.Pret }}</p>
+        <button data-id="{{ carte.IDProdus }}" data-nume={{ carte.Titlu }} class="btn_cos_virtual">Adauga in cos</button>
+        <button data-id="{{ carte.IDProdus }}" data-nume={{ carte.Titlu }} class="btn_cos_virtual_stergere">Sterge din cos</button>
+        <button data-id="{{ carte.IDProdus }}" data-nume={{ carte.Titlu }} class="btn_cos_virtual_adauga">+</button>
+        <button data-id="{{ carte.IDProdus }}" data-nume={{ carte.Titlu }} class="btn_cos_virtual_scade">-</button>
+        <input type="text" data-id="{{ carte.IDProdus }}" name="cantitate" value="0" class="cantitate">
+    </article>
+    {% endfor %}
+
+    </body>
+</html>
+
+O sa avem si pentru fiecare produs in parte o pagina, si o sa mai avem putin la views si urls
+
+2.Se va realiza o pagina in care se vor afisa produsele din localStorage salvate in cosul virtual fiecare cu cantitatea aleasa si cu pretul unitar dar si calculat partial (pret unitar inmultit cu cantitatea de produse).
+Sub listarea produselor din cosul virtual se va afisa si pretul total calculat cat si numarul total de obiecte.
+Pagina va avea și opțiunea de a ordona obiectele după nume, respectiv după preț.
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <title>Cosul meu</title>
+    <style>
+        article {
+            border: 1px solid grey;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        .total {
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let id_uri_cos = localStorage.getItem("cos_virtual");
+            if (id_uri_cos) {
+                let vector_cos = id_uri_cos.split(",");
+                let produseInCos = vector_cos.map(item => item.split("/")[0]);
+                let cantitatiInCos = vector_cos.map(item => item.split("/")[1]);
+
+                let cosContainer = document.getElementById("cosul-meu");
+                let totalProduse = 0;
+                let totalPret = 0;
+                
+                {% for film in filme %}
+                if (produseInCos.includes("{{ film.IDProdus }}")) {
+                    let index = produseInCos.indexOf("{{ film.IDProdus }}");
+                    let cantitate = cantitatiInCos[index];
+                    let pretTotal = {{ film.Pret }} * cantitate;
+                    totalProduse += parseInt(cantitate);
+                    totalPret += pretTotal;
+                    cosContainer.innerHTML += `
+                        <article data-id="{{ film.IDProdus }}">
+                            <p>{{ film.Titlu }}</p>
+                            <p>Pret unitar: {{ film.Pret }}</p>
+                            <p>Cantitate: ${cantitate}</p>
+                            <p>Pret total: ${pretTotal}</p>
+                        </article>
+                    `;
+                }
+                {% endfor %}
+
+                {% for album in albume %}
+                if (produseInCos.includes("{{ album.IDProdus }}")) {
+                    let index = produseInCos.indexOf("{{ album.IDProdus }}");
+                    let cantitate = cantitatiInCos[index];
+                    let pretTotal = {{ album.Pret }} * cantitate;
+                    totalProduse += parseInt(cantitate);
+                    totalPret += pretTotal;
+                    cosContainer.innerHTML += `
+                        <article data-id="{{ album.IDProdus }}">
+                            <p>{{ album.Titlu }}</p>
+                            <p>Pret unitar: {{ album.Pret }}</p>
+                            <p>Cantitate: ${cantitate}</p>
+                            <p>Pret total: ${pretTotal}</p>
+                        </article>
+                    `;
+                }
+                {% endfor %}
+
+                {% for carte in carti %}
+                if (produseInCos.includes("{{ carte.IDProdus }}")) {
+                    let index = produseInCos.indexOf("{{ carte.IDProdus }}");
+                    let cantitate = cantitatiInCos[index];
+                    let pretTotal = {{ carte.Pret }} * cantitate;
+                    totalProduse += parseInt(cantitate);
+                    totalPret += pretTotal;
+                    cosContainer.innerHTML += `
+                        <article data-id="{{ carte.IDProdus }}">
+                            <p>{{ carte.Titlu }}</p>
+                            <p>Pret unitar: {{ carte.Pret }}</p>
+                            <p>Cantitate: ${cantitate}</p>
+                            <p>Pret total: ${pretTotal}</p>
+                        </article>
+                    `;
+                }
+                {% endfor %}
+
+                cosContainer.innerHTML += `
+                    <div class="total">
+                        <p>Total produse: ${totalProduse}</p>
+                        <p>Pret total: ${totalPret}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Cosul meu</h1>
+    <div id="cosul-meu">
+    </div>
+</body>
+</html>
+
+O sa mai avem putin si in views si in urls
