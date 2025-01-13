@@ -25,6 +25,12 @@ while True:
     schedule.run_pending() -verifică dacă există sarcini (funcții) care trebuie rulate conform programării. Dacă există, le execută.
     time.sleep(1) -face ca bucla să se oprească pentru o secundă înainte de a verifica din nou.Acest lucru reduce consumul de resurse ale procesorului
 
+def salut(nume):
+    print(f"Salut, {nume}!")
+
+schedule.every(1).minute.do(salut, nume="Ana")
+
+
 schedule.every(10).seconds.do(task)-La fiecare 10 secunde
 schedule.every(2).minutes.do(task)-La fiecare 2 minute
 schedule.every().hour.do(task) -In fiecare ora
