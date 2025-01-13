@@ -195,3 +195,17 @@ def task4(): --daca utilizatorul este in staff infiecare miercuri o sa primeasca
                 [user.email],
                 fail_silently=False,
             )
+
+4.Se va crea un grup numit Moderatori. Pentru user veți adăuga și un câmp boolean numit "blocat". Un moderator va avea următoarele drepturi:
+va putea intra in interfața admin
+vizualizarea utilizatorilor (din permisiunile implicite ale modelului)
+editarea câmpurilor: nume, prenume și e-mail
+blocarea/deblocarea utilizatorilor.
+Un utilizator care este blocat nu se poate loga pe site. Dacă utilizatorul va încerca să se logheze, va primi un mesaj de eroare  prin care i se spune că i-a fost contul blocat.
+
+Adaugam blocat in models.py
+Adaugam in functia custom login view din views.py:
+if user.blocat == True:
+               return HttpResponseForbidden(render(request, 'aplicatiedjango/403html1.html', {'titlu': 'Eroare autentificare', 'mesaj': 'Contul este blocat.'}))         
+
+Cream fisierul html 403html1.html
