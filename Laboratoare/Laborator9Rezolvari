@@ -6,3 +6,99 @@ messages.debug nu o sa se vada utilizatorului
 2.Generați un sitemap pentru aplicație incluzând toate modelele relevante (nu uitati sa faceti paginile proprii pentru modele, de exemplu: /model/id) și 
 paginile statice care nu depind de logarea utilizatorilor.
 
+models.py
+class Film(models.Model):
+    IDFilm = models.PositiveIntegerField(primary_key=True, unique=True)
+    IDProdus = models.OneToOneField(Produs, on_delete=models.CASCADE)
+    Titlu = models.CharField(max_length=50)
+    ActorPrincial = models.CharField(max_length=40)
+    Gen = models.CharField(max_length=30)
+    EsteRomanesc = models.BooleanField()
+    Rating = models.CharField(max_length=10)
+    Pret = models.DecimalField(max_digits=8, decimal_places=2)
+    DescriereFilm = models.TextField()
+    actualizat_la = models.DateTimeField(auto_now=True)    --facem asta pentru modelele Film, Carte si Album
+    
+    def get_absolute_url(self): --facem asta pentru modelele Film, Carte si Album
+         return reverse("film", kwargs={'id': self.IDFilm})
+
+
+sitemaps.py
+
+from django.contrib.sitemaps import Sitemap
+from django.urls import reverse
+from .models import Carte, AlbumMuzical, Film, Produs
+
+
+class CarteSitemap(Sitemap):
+    changefreq = "yearly"
+    priority = 0.5
+
+    def items(self):
+        return Carte.objects.all()
+
+    def lastmod(self, obj):
+        return obj.actualizat_la
+    
+class AlbumMuzicalSitemap(Sitemap):
+    changefreq = "yearly"
+    priority = 0.5
+
+    def items(self):
+        return AlbumMuzical.objects.all()
+
+    def lastmod(self, obj):
+        return obj.actualizat_la
+
+class FilmSitemap(Sitemap):
+    changefreq = "yearly"
+    priority = 0.5
+
+    def items(self):
+        return Film.objects.all()
+
+    def lastmod(self, obj):
+        return obj.actualizat_la
+    
+class VederiStaticeSitemap(Sitemap):
+    priority = 0.5
+    changefreq = 'yearly'
+
+    def items(self):
+        return ['mesaj_trimis']
+
+    def location(self, item):
+        return reverse(item)
+
+
+urls.py
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import CarteSitemap, AlbumMuzicalSitemap, FilmSitemap, ProdusSitemap, VederiStaticeSitemap
+
+sitemaps = {
+    'carte': CarteSitemap,
+    'album': AlbumMuzicalSitemap,
+    'film': FilmSitemap,
+    'static': VederiStaticeSitemap,
+}
+urlpatterns = [
+    path('carte/<int:id>/', views.carte, name='carte'),
+    path('album/<int:id>/', views.album, name='album'),
+    path('film/<int:id>/', views.film, name='film'),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+  ]
+
+
+views.py
+def carte(request, id):
+    carte = get_object_or_404(Carte, IDCarte=id)
+    return render(request, 'aplicatiedjango/carte.html', {'carte': carte})
+
+def album(request, id):
+    album = get_object_or_404(AlbumMuzical, IDAlbum=id)
+    return render(request, 'aplicatiedjango/albume.html', {'album': album})
+
+def film(request, id):
+    film = get_object_or_404(Film, IDFilm=id)
+    return render(request, 'aplicatiedjango/film.html', {'film': film})
+
