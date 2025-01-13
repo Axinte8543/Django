@@ -131,7 +131,7 @@ class CarteSitemap(Sitemap):
 
 Adaugarea unei pagine statice(fara modele) in sitemap
 
-Este util pentru a include în sitemap paginile generate de view-uri statice, cum ar fi pagina principală (index) sau pagina de contact.
+Este util pentru a include în sitemap paginile generate de view-uri statice, cum ar fi pagina principală (index) sau pagina de contact care nu depind de modele.
 
 class VederiStaticeSitemap(Sitemap):
     changefreq = "monthly"
