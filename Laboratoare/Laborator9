@@ -124,7 +124,7 @@ class CarteSitemap(Sitemap):
     priority = 0.8   --Prioritatea (1.0 = cea mai mare)      
 
     def items(self):
-        return Carte.objects.all() --Returneaza obiectele care vor fi incluse in sitemap
+        return Carte.objects.filter(published=True) --Returneaza obiectele care vor fi incluse in sitemap si sunt publicate
 
     def lastmod(self, obj):
         return obj.actualizat_la --Returneaza data ultimei modificari pentru fiecare obiect
