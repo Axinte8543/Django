@@ -102,3 +102,96 @@ def film(request, id):
     film = get_object_or_404(Film, IDFilm=id)
     return render(request, 'aplicatiedjango/film.html', {'film': film})
 
+
+3.Implementați următoarele taskuri programate (scheduled):
+La fiecare K minute se vor șterge utilizatorii care sunt înregistrați dar nu au e-mail confirmat. Setati voi K convenabil (de exemplu K=2).
+În fiecare zi din saptamana Z și oră O (completați Z și O cu o zi și o oră convenabilă, de exemplu Z=luni) se va trimite un newsletter către toți utilizatorii mai vechi de X minute (alegeți voi X).
+Mai implementați încă 2 taskuri programate la alegere care să fie relevante pentru proiectul vostru:
+unul care să se repete la fiecare M minute (alegeți voi M).
+altul care să fie programat în fiecare zi Z2 și oră O2 (alegeți voi Z2 si O2).
+
+ruleaza_taskuri.py
+import schedule
+import time
+import os
+import django
+import sys
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proiectdjango.settings')
+django.setup()
+
+from aplicatiedjango import tasks
+
+def run_scheduler():
+    schedule.every(2).minutes.do(tasks.task1)
+    schedule.every().monday.at("13:15").do(tasks.task2)
+    schedule.every(30).minutes.do(tasks.task3)
+    schedule.every().wednesday.at("09:00").do(tasks.task4)
+    
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+        
+if __name__ == '__main__':
+    try:
+        run_scheduler()
+    except KeyboardInterrupt:
+        print("Scheduler oprit manual.")
+        sys.exit()
+
+tasks.py
+
+import schedule
+import time
+import os
+import django
+from .models import CustomUser
+from datetime import timedelta
+from django.utils import timezone
+from django.core.mail import send_mail
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proiectdjango.settings')
+django.setup()
+
+def task1():
+    users=CustomUser.objects.all()
+    for user in users:
+        if user.confirmare_email==False:
+           user.delete()
+           
+def task2():
+    users=CustomUser.objects.all()
+    timpinregistrat = timezone.now() - timedelta(minutes=60)
+    users = CustomUser.objects.filter(date_joined__lt=timpinregistrat)
+    for user in users:
+           send_mail(
+               'Newsletter',
+               'Bine ati venit pe site-ul nostru!',
+               'iniminiminimo3@gmail.com',
+               [user.email],
+               fail_silently=False,
+           )
+
+def task3(): --daca utilizatorul nu a intrat de mai mult de 30 de minute ii dam mail-ul asta
+    ultimulintrat=timezone.now()-timedelta(minutes=30)
+    users=CustomUser.objects.filter(last_login__lt=ultimulintrat)
+    for user in users:
+        send_mail(
+            'Reamintire',
+            'Utilizatorule, nu ai mai intrat de mult pe site-ul nostru, te asteptam cu drag!',
+            'iniminiminimo3@gmail.com',
+            [user.email],
+            fail_silently=False,
+        )
+    
+def task4(): --daca utilizatorul este in staff infiecare miercuri o sa primeasca mesaj ca programul de lucru este pana la 3 in ziua respectiva
+    users=CustomUser.objects.all()
+    for user in users:
+        if user.is_staff==True:
+            send_mail(
+                'Draga adminule',
+                'Nu uita ca astezi este miercuri, si ziua de lucru este pana la ora 15:00',
+                'iniminiminimo3@gmail.com',
+                [user.email],
+                fail_silently=False,
+            )
