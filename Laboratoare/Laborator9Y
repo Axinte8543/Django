@@ -1,0 +1,107 @@
+Metoda fetch este folosită pentru a trimite cereri HTTP către un server și pentru a primi răspunsuri. 
+Implicit, aceasta face o cerere de tip GET (dacă nu este specificat altceva). 
+Este preferată față de metodele mai vechi precum XMLHttpRequest datorită interfeței sale moderne bazate pe obiecte de tip Promise.
+
+fetch(url, [optiuni])
+
+Considerăm că în exemplul de mai jos primim niste date în format JSON:
+fetch('http://localhost:8000/aplicatie_exemplu/proceseaza_date')
+  .then(raspuns => raspuns.json())
+  .then(date => console.log(date))
+  .catch(eroare => console.error('Eroare:', eroare));
+
+Variabila raspuns este de tip Response, un obiect care conține datele returnate de server. 
+Pentru a extrage datele, de obicei folosim metode precum response.json(), response.text() sau response.blob().
+
+Metoda fetch returnează un obiect de tip Promise. 
+Aceasta este fie rezolvată (dacă cererea are succes), fie respinsă (în caz de eroare de rețea sau altă problemă).
+
+În caz de succes, cu raspuns.json() convertim datele în obiect pe care îl putem apoi accesa în variabila date (care, în exemplu este afișată în consolă).
+
+
+fetch - exemplu de tip GET cu parametri de query
+const url = new URL('http://localhost:8000/aplicatie_exemplu/proceseaza_date');
+url.searchParams.append('a', '10');
+url.searchParams.append('b', '1');
+url.searchParams.append('text', 'ceva');
+
+fetch(url)
+  .then(raspuns => raspuns.json())
+  .then(date => console.log(date))
+  .catch(eroare => console.error('Eroare:', eroare));
+
+
+Obiectul Response
+Proprietăți și metode ale obiectului Response:
+
+response.ok: true dacă cererea a fost reușită (status 200-299).
+response.status: Codul de status HTTP (ex. 200, 404, 500).
+response.statusText: Text asociat cu codul de status (ex. "OK", "Not Found").
+response.headers: Obiect ce conține anteturile răspunsului.
+response.json(): Metodă pentru a obține conținutul răspunsului în format json.
+response.text(): Metodă pentru a obține conținutul răspunsului în format text.
+response.blob(): Metodă pentru a obține conținutul răspunsului în format blob.
+
+
+Exemplu fetch cu await
+Uneori ne este mai ușor să folosim fetch într-o funcție asincronă și să primim răspunsul returnat de fetch, apelând funcția cu cuvântul cheie await:
+async function obtineDate() {
+    try {
+        const raspuns = await fetch('http://localhost:8000/aplicatie_exemplu/proceseaza_date');
+            if (!raspuns.ok) {
+                throw new Error(`Eroare HTTP. Status: ${raspuns.status}`);
+            }
+        const date = await raspuns.json();
+        console.log('Date primite:', date);
+        }
+    catch (eroare) {
+        console.error('A apărut o eroare:', eroare);
+    }
+}
+obtineDate();
+
+
+Fetch cu POST
+Funcția fetch pentru cererile HTTP de tip POST este utilizată pentru a trimite date către un server. 
+Spre deosebire de cererile GET, care doar obțin informații, cererile POST sunt folosite, de obicei, 
+pentru a crea resurse sau pentru a trimite date ce necesită procesare, cum ar fi date din formulare, date JSON etc.
+
+De obicei, apelul fetch cu metoda POST are formatul:
+fetch(url, {
+    method: 'POST',
+    headers: {},
+    body: date
+});
+
+Argumente:
+url: adresa către care se face cererea.
+headers: anteturile cererii (de exemplu, Content-Type). Mai des setate pentru cereri de tip POST decât GET
+body: Datele care urmează să fie trimise către server. Acestea pot fi stringuri, JSON, sau alte tipuri de date.
+
+
+
+Exemplu fetch cu POST
+fetch('http://localhost:8000/aplicatie_exemplu/proceseaza_date', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        nume: 'Irina',
+        varsta: 38
+    })
+})
+    .then(raspuns => {
+        if (!raspuns.ok) {
+            throw new Error(`Eroare HTTP. Status: ${raspuns.status}`);
+        }
+        return raspuns.json();
+    })
+    .then(date => {
+        console.log('Raspuns:', date);
+    })
+    .catch(eroare => {
+        console.error('Eroare:', eroare);
+    });
+
+
